@@ -70,7 +70,7 @@ fun InicioScreen(
             ) {
                 Text(
                     "Comenzar",
-                    style = MaterialTheme.typography.labelLarge.copy(fontSize = 30.sp)
+                    style = MaterialTheme.typography.labelLarge.copy(fontSize = 22.sp)
                 )
             }
 
