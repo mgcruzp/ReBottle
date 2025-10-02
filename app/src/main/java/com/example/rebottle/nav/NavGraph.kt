@@ -7,15 +7,15 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.NavType
 import com.example.rebottle.domain.data.Role
-import com.example.rebottle.ui.screens.InicioScreen
-import com.example.rebottle.ui.screens.LoginScreen
-import com.example.rebottle.ui.screens.RegisterScreen
+import com.example.rebottle.ui.screens.log.InicioScreen
+import com.example.rebottle.ui.screens.log.LoginScreen
+import com.example.rebottle.ui.screens.log.RegisterScreen
 import androidx.compose.material3.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.compose.runtime.getValue
+import com.example.rebottle.ui.screens.home.UserHome
 
 @Composable
 fun NavGraph(nav: NavHostController) {
@@ -57,8 +57,14 @@ fun NavGraph(nav: NavHostController) {
         ) { backStackEntry ->
             val roleStr = backStackEntry.arguments?.getString(Routes.Home.ARG_ROLE) ?: Role.USUARIO.name
             val role = runCatching { Role.valueOf(roleStr) }.getOrDefault(Role.USUARIO)
-            HomeScreen(role = role)
+
+            when (role) {
+                Role.USUARIO -> UserHome()
+                Role.RECOLECTOR -> Surface { Text("Home Recolector — por construir") }
+                Role.EMPRESA_REP -> Surface { Text("Home Empresa REP — por construir") }
+            }
         }
+
     }
 }
 

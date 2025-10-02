@@ -1,4 +1,4 @@
-package com.example.rebottle.ui.screens
+package com.example.rebottle.ui.screens.log
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.sp
 import com.example.rebottle.R
 import com.example.rebottle.domain.data.Role
 import com.example.rebottle.ui.components.RoleSelector
+import com.example.rebottle.ui.components.PrimaryButton
 import androidx.compose.foundation.text.KeyboardOptions
 
 @Composable
@@ -37,7 +38,7 @@ fun RegisterScreen(
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Logo (opcional)
+            // Logo
             Image(
                 painter = painterResource(id = R.drawable.logo_rebottle),
                 contentDescription = "Logo Rebottle",
@@ -94,33 +95,30 @@ fun RegisterScreen(
 
             // Imagen basurita justo después de los campos
             Spacer(Modifier.height(16.dp))
+            Image(
+                painter = painterResource(id = R.drawable.basurita),
+                contentDescription = "Basurita",
+                contentScale = ContentScale.Fit,
+                modifier = Modifier.size(180.dp)
+            )
 
             // Selector de rol
             Spacer(Modifier.height(16.dp))
             RoleSelector(selected = role, onSelect = { role = it })
 
-            // Botón Continuar grande y verde
+            // Botón Continuar grande (PrimaryButton)
             Spacer(Modifier.height(24.dp))
-            Button(
-                onClick = { role?.let(onRegistered) },
+            PrimaryButton(
+                text = "Continuar",
                 enabled = role != null && name.isNotBlank() && email.isNotBlank() && pass.isNotBlank(),
+                onClick = { role?.let(onRegistered) },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(60.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF5C8C5F), // verde botón
-                    contentColor = Color(0xFF1B4332)    // texto verde oscuro
-                ),
-                shape = MaterialTheme.shapes.large
-            ) {
-                Text(
-                    "Continuar",
-                    style = MaterialTheme.typography.labelLarge.copy(fontSize = 22.sp)
-                )
-            }
+                    .height(60.dp)
+            )
 
             Spacer(Modifier.height(18.dp))
-            TextButton(onClick = onGoLogin, modifier = Modifier.align(Alignment.CenterHorizontally)){
+            TextButton(onClick = onGoLogin, modifier = Modifier.align(Alignment.CenterHorizontally)) {
                 Text("Ya tengo cuenta")
             }
         }

@@ -1,4 +1,4 @@
-package com.example.rebottle.ui.screens
+package com.example.rebottle.ui.screens.log
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -10,9 +10,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.airbnb.lottie.compose.*
 import com.example.rebottle.R
+import com.example.rebottle.ui.components.PrimaryButton   // 👈 IMPORTANTE
 
 @Composable
 fun InicioScreen(
@@ -32,7 +32,7 @@ fun InicioScreen(
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
                     .padding(top = 40.dp)
-                    .size(350.dp) // ajusta si lo quieres más grande/pequeño
+                    .size(350.dp)
             )
 
             Spacer(Modifier.height(5.dp))
@@ -52,29 +52,18 @@ fun InicioScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(360.dp)
-                    // evita tamaños gigantes que choquen con el logo
             )
 
-            // Botón justo debajo del Lottie
+            // Botón justo debajo del Lottie (PrimaryButton)
             Spacer(Modifier.height(10.dp))
-            Button(
+            PrimaryButton(
+                text = "Comenzar",
                 onClick = onStart,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(60.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF5C8C5F),
-                    contentColor  = Color(0xFF1B4332)
-                ),
-                shape = MaterialTheme.shapes.large
-            ) {
-                Text(
-                    "Comenzar",
-                    style = MaterialTheme.typography.labelLarge.copy(fontSize = 22.sp)
-                )
-            }
+                    .height(60.dp)
+            )
 
-            // Espacio flexible abajo para que no quede pegado en pantallas altas
             Spacer(Modifier.height(30.dp))
         }
     }
