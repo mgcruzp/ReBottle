@@ -25,7 +25,6 @@ fun InicioScreen(
                 .padding(horizontal = 24.dp, vertical = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Logo arriba
             Image(
                 painter = painterResource(id = R.drawable.logo_rebottle),
                 contentDescription = "Logo Rebottle",
@@ -37,7 +36,6 @@ fun InicioScreen(
 
             Spacer(Modifier.height(5.dp))
 
-            // Lottie al centro
             val composition by rememberLottieComposition(
                 LottieCompositionSpec.RawRes(R.raw.garbagecollection)
             )
@@ -51,11 +49,9 @@ fun InicioScreen(
                 progress = { progress },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(360.dp)
+                    .height(350.dp)
             )
 
-            // Botón justo debajo del Lottie (PrimaryButton)
-            Spacer(Modifier.height(10.dp))
             PrimaryButton(
                 text = "Comenzar",
                 onClick = onStart,

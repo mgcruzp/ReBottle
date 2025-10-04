@@ -17,6 +17,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 
+
+
 sealed class UserRoute(val path: String) {
     data object Inicio : UserRoute("user/inicio")
     data object Programar : UserRoute("user/programar")
@@ -37,11 +39,11 @@ fun UserHome() {
     )
 
     Scaffold(
-        containerColor = Color.White,            // 👈 fondo del Scaffold en blanco
+        containerColor = Color.White,
         contentColor   = MaterialTheme.colorScheme.onBackground,
         bottomBar = {
             NavigationBar(
-                containerColor = Color.White,    // 👈 fondo de la bottom bar en blanco
+                containerColor = Color.White,
             ) {
                 val current by nav.currentBackStackEntryAsState()
                 val currentRoute = current?.destination?.route
@@ -63,14 +65,13 @@ fun UserHome() {
             }
         }
     ) { padding ->
-        // 👇 contenedor del NavHost también en blanco
         NavHost(
             navController = nav,
             startDestination = UserRoute.Inicio.path,
             modifier = Modifier
                 .padding(padding)
                 .fillMaxSize()
-                .background(Color.White)        // 👈 asegura blanco bajo cada pantalla
+                .background(Color.White)
         ) {
             composable(UserRoute.Inicio.path) {
                 InicioUsuarioScreen(

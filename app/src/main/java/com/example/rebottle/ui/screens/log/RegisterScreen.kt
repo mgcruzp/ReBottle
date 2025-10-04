@@ -48,7 +48,6 @@ fun RegisterScreen(
                     .size(200.dp)
             )
 
-            // Título grande, centrado y verde
             Text(
                 text = "Crear cuenta",
                 style = MaterialTheme.typography.headlineLarge.copy(
@@ -61,7 +60,6 @@ fun RegisterScreen(
 
             Spacer(Modifier.height(24.dp))
 
-            // Campos
             OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
@@ -93,20 +91,11 @@ fun RegisterScreen(
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
             )
 
-            // Imagen basurita justo después de los campos
             Spacer(Modifier.height(16.dp))
-            Image(
-                painter = painterResource(id = R.drawable.basurita),
-                contentDescription = "Basurita",
-                contentScale = ContentScale.Fit,
-                modifier = Modifier.size(180.dp)
-            )
 
-            // Selector de rol
             Spacer(Modifier.height(16.dp))
             RoleSelector(selected = role, onSelect = { role = it })
 
-            // Botón Continuar grande (PrimaryButton)
             Spacer(Modifier.height(24.dp))
             PrimaryButton(
                 text = "Continuar",
@@ -119,7 +108,15 @@ fun RegisterScreen(
 
             Spacer(Modifier.height(18.dp))
             TextButton(onClick = onGoLogin, modifier = Modifier.align(Alignment.CenterHorizontally)) {
-                Text("Ya tengo cuenta")
+                Text(
+                    "Ya tengo cuenta",
+                    style = MaterialTheme.typography.headlineLarge.copy(
+                        fontSize = 15.sp,
+                        color = Color(0xFF1B4332),
+                        textAlign = TextAlign.Center
+                    ),
+                    modifier = Modifier.fillMaxWidth()
+                    )
             }
         }
     }

@@ -52,7 +52,6 @@ fun InicioUsuarioScreen(
 //            )
         }
 
-        // Blob decor abajo (opcional)
         Spacer(Modifier.weight(1f))
 
     }

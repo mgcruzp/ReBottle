@@ -36,7 +36,6 @@ fun LoginScreen(
                 .padding(10.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Logo
             Image(
                 painter = painterResource(id = R.drawable.logo_rebottle),
                 contentDescription = "Logo Rebottle",
@@ -46,7 +45,6 @@ fun LoginScreen(
                     .size(200.dp)
             )
 
-            // Título
             Text(
                 text = "Iniciar sesión",
                 style = MaterialTheme.typography.headlineLarge.copy(
@@ -59,7 +57,6 @@ fun LoginScreen(
 
             Spacer(Modifier.height(24.dp))
 
-            // Campos
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
@@ -95,7 +92,6 @@ fun LoginScreen(
                 }
             }
 
-            // Imagen “basurita”
             Spacer(Modifier.height(5.dp))
             Image(
                 painter = painterResource(id = R.drawable.basurita),
@@ -104,7 +100,6 @@ fun LoginScreen(
                 modifier = Modifier.size(250.dp)
             )
 
-            // Botón Continuar (PrimaryButton)
             Spacer(Modifier.height(20.dp))
             PrimaryButton(
                 text = "Continuar",
@@ -120,7 +115,15 @@ fun LoginScreen(
                 onClick = onGoRegister,
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             ) {
-                Text("Aún no tengo cuenta")
+                Text(
+                    text="Aún no tengo cuenta",
+                    style = MaterialTheme.typography.headlineLarge.copy(
+                        fontSize = 15.sp,
+                        color = Color(0xFF1B4332),
+                        textAlign = TextAlign.Center
+                    ),
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
         }
     }
