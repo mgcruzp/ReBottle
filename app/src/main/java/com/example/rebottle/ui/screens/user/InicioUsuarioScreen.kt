@@ -2,13 +2,17 @@ package com.example.rebottle.ui.screens.home
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.rebottle.R
 
 @Composable
@@ -16,57 +20,84 @@ fun InicioUsuarioScreen(
     onProgramar: () -> Unit,
     onRecompensas: () -> Unit
 ) {
-    Column(
-        Modifier
-            .fillMaxSize()
-            .padding(horizontal = 20.dp, vertical = 12.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
+    Surface(color = Color.White) {
+        Box(Modifier.fillMaxSize()) {
 
-
-        Image(
-            painter = painterResource(R.drawable.logo_rebottle),
-            contentDescription = "Rebottle",
-            contentScale = ContentScale.Fit,
-            modifier = Modifier.size(180.dp)
-        )
-
-        Spacer(Modifier.height(8.dp))
-
-        // Tarjetas acciones
-        Row(
-            Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-//            ActionCard(
-//                //iconRes = R.drawable.ic_calendar, // si no tienes, usa un png o reemplaza por material Icon
-//                title = "Programar\nsolicitud",
-//                onClick = onProgramar,
-//                modifier = Modifier.weight(1f)
+//            Image(
+//                painter = painterResource(id = R.drawable.decor_top),
+//                contentDescription = null,
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .height(220.dp)
+//                    .align(Alignment.TopCenter),
+//                contentScale = ContentScale.FillBounds
 //            )
-//            ActionCard(
-//                iconRes = R.drawable.ic_trophy,
-//                title = "Recompensas",
-//                onClick = onRecompensas,
-//                modifier = Modifier.weight(1f)
-//            )
+
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .statusBarsPadding()
+                    .padding(horizontal = 20.dp, vertical = 12.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            )  {
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    "Hola usuario!",
+                    style = MaterialTheme.typography.titleLarge.copy(
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Color(0xFF1B4332)
+                    )
+                )
+
+                Spacer(Modifier.height(8.dp))
+                Image(
+                    painter = painterResource(R.drawable.logo_rebottle),
+                    contentDescription = "Rebottle",
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier.size(180.dp)
+                )
+
+                Spacer(Modifier.height(16.dp))
+
+                ActionCard(
+                    imageRes = R.drawable.programar,
+                    title = "Programar solicitud",
+                    onClick = onProgramar,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Spacer(Modifier.height(16.dp))
+
+                ActionCard(
+                    imageRes = R.drawable.recompensas,
+                    title = "Recompensas",
+                    onClick = onRecompensas,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Spacer(Modifier.weight(1f))
+            }
         }
-
-        Spacer(Modifier.weight(1f))
-
     }
 }
 
 @Composable
 private fun ActionCard(
-    iconRes: Int,
+    imageRes: Int,
     title: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     ElevatedCard(
         onClick = onClick,
-        modifier = modifier.height(140.dp)
+        modifier = modifier.height(190.dp),
+        colors = CardDefaults.elevatedCardColors(
+            containerColor = Color.White,
+            contentColor = Color(0xFF1B4332)
+        ),
+        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 4.dp),
+        shape = RoundedCornerShape(20.dp)
     ) {
         Column(
             Modifier
@@ -76,12 +107,12 @@ private fun ActionCard(
             verticalArrangement = Arrangement.SpaceBetween
         ) {
             Image(
-                painter = painterResource(iconRes),
+                painter = painterResource(imageRes),
                 contentDescription = title,
-                modifier = Modifier.size(56.dp),
-                contentScale = ContentScale.Fit
+                contentScale = ContentScale.Fit,
+                modifier = Modifier.size(110.dp)
             )
-            Text(title, style = MaterialTheme.typography.titleMedium)
+            Text(title, style = MaterialTheme.typography.bodyMedium)
         }
     }
 }

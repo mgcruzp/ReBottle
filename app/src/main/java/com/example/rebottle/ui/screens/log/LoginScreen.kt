@@ -20,6 +20,9 @@ import com.example.rebottle.domain.data.Role
 import com.example.rebottle.ui.components.PrimaryButton
 import androidx.compose.foundation.text.KeyboardOptions
 
+private val Green = Color(0xFF1B4332)
+private val Mint  = Color(0xFFDCFFD6)
+
 @Composable
 fun LoginScreen(
     onLogin: (Role) -> Unit,
@@ -30,100 +33,121 @@ fun LoginScreen(
     var remember by remember { mutableStateOf(false) }
 
     Surface(color = Color.White) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(10.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+        Box(Modifier.fillMaxSize()) {
+
             Image(
-                painter = painterResource(id = R.drawable.logo_rebottle),
-                contentDescription = "Logo Rebottle",
-                contentScale = ContentScale.Fit,
-                modifier = Modifier
-                    .padding(top = 8.dp)
-                    .size(200.dp)
-            )
-
-            Text(
-                text = "Iniciar sesión",
-                style = MaterialTheme.typography.headlineLarge.copy(
-                    fontSize = 30.sp,
-                    color = Color(0xFF1B4332),
-                    textAlign = TextAlign.Center
-                ),
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(Modifier.height(24.dp))
-
-            OutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
-                label = { Text("Correo") },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Email,
-                    imeAction = ImeAction.Next
-                )
-            )
-            Spacer(Modifier.height(12.dp))
-            OutlinedTextField(
-                value = pass,
-                onValueChange = { pass = it },
-                label = { Text("Contraseña") },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
-                visualTransformation = PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
-            )
-
-            Spacer(Modifier.height(8.dp))
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Checkbox(checked = remember, onCheckedChange = { remember = it })
-                Text("Recordarme")
-                Spacer(Modifier.weight(1f))
-                TextButton(onClick = { /* TODO: recuperación */ }) {
-                    Text("¿Olvidó su contraseña?")
-                }
-            }
-
-            Spacer(Modifier.height(5.dp))
-            Image(
-                painter = painterResource(id = R.drawable.basurita),
-                contentDescription = "Basurita",
-                contentScale = ContentScale.Fit,
-                modifier = Modifier.size(250.dp)
-            )
-
-            Spacer(Modifier.height(20.dp))
-            PrimaryButton(
-                text = "Continuar",
-                enabled = email.isNotBlank() && pass.isNotBlank(),
-                onClick = { onLogin(Role.USUARIO) },
+                painter = painterResource(id = R.drawable.decor_top), // 👈 tu PNG verde
+                contentDescription = null,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(60.dp)
+                    .height(350.dp)
+                    .align(Alignment.TopCenter),
+                contentScale = ContentScale.FillWidth
             )
 
-            Spacer(Modifier.height(18.dp))
-            TextButton(
-                onClick = onGoRegister,
-                modifier = Modifier.align(Alignment.CenterHorizontally)
+            // Contenido
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp, vertical = 10.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                // Logo
+                Spacer(Modifier.height(8.dp))
+                Image(
+                    painter = painterResource(id = R.drawable.logo_rebottle),
+                    contentDescription = "Logo Rebottle",
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier.size(200.dp)
+                )
+
+                // Título
                 Text(
-                    text="Aún no tengo cuenta",
+                    text = "Iniciar sesión",
                     style = MaterialTheme.typography.headlineLarge.copy(
-                        fontSize = 15.sp,
-                        color = Color(0xFF1B4332),
+                        fontSize = 30.sp,
+                        color = Green,
                         textAlign = TextAlign.Center
                     ),
                     modifier = Modifier.fillMaxWidth()
                 )
+
+                Spacer(Modifier.height(24.dp))
+
+                // Campos
+                OutlinedTextField(
+                    value = email,
+                    onValueChange = { email = it },
+                    label = { Text("Correo") },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Email,
+                        imeAction = ImeAction.Next
+                    ),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Green,
+                        unfocusedBorderColor = Mint,
+                        cursorColor = Green,
+                        focusedLabelColor = Green
+                    )
+                )
+                Spacer(Modifier.height(12.dp))
+                OutlinedTextField(
+                    value = pass,
+                    onValueChange = { pass = it },
+                    label = { Text("Contraseña") },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    visualTransformation = PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Green,
+                        unfocusedBorderColor = Mint,
+                        cursorColor = Green,
+                        focusedLabelColor = Green
+                    )
+                )
+
+                Spacer(Modifier.height(8.dp))
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Checkbox(checked = remember, onCheckedChange = { remember = it })
+                    Text("Recordarme")
+                    Spacer(Modifier.weight(1f))
+                    TextButton(onClick = { /* TODO: recuperación */ }) {
+                        Text("¿Olvidó su contraseña?", color = Green)
+                    }
+                }
+
+                Spacer(Modifier.height(6.dp))
+                Image(
+                    painter = painterResource(id = R.drawable.basurita),
+                    contentDescription = "Basurita",
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier.size(230.dp)
+                )
+
+                Spacer(Modifier.height(16.dp))
+                PrimaryButton(
+                    text = "Continuar",
+                    enabled = email.isNotBlank() && pass.isNotBlank(),
+                    onClick = { onLogin(Role.USUARIO) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(60.dp)
+                )
+
+                Spacer(Modifier.height(14.dp))
+                TextButton(onClick = onGoRegister) {
+                    Text(
+                        text = "Aún no tengo cuenta",
+                        color = Green,
+                        fontSize = 15.sp
+                    )
+                }
             }
         }
     }

@@ -12,20 +12,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-
-
-
-sealed class UserRoute(val path: String) {
-    data object Inicio : UserRoute("user/inicio")
-    data object Programar : UserRoute("user/programar")
-    data object Recompensas : UserRoute("user/recompensas")
-    data object Historial : UserRoute("user/historial")
-    data object Perfil : UserRoute("user/perfil")
-}
+import com.example.rebottle.nav.UserRoute
 
 data class BottomItem(val route: UserRoute, val label: String, val icon: ImageVector)
 
@@ -38,15 +30,20 @@ fun UserHome() {
         BottomItem(UserRoute.Perfil,    "Perfil",    Icons.Filled.Person),
     )
 
+    val PillGreen = Color(0xFFB8F8AD) // color de la “pastilla” seleccionada
+    val TextIcon  = Color(0xFF1B4332) // color de íconos y textos
+
     Scaffold(
         containerColor = Color.White,
         contentColor   = MaterialTheme.colorScheme.onBackground,
         bottomBar = {
             NavigationBar(
                 containerColor = Color.White,
+                tonalElevation = 0.dp
             ) {
                 val current by nav.currentBackStackEntryAsState()
                 val currentRoute = current?.destination?.route
+
                 items.forEach { item ->
                     NavigationBarItem(
                         selected = currentRoute == item.route.path,
@@ -59,7 +56,14 @@ fun UserHome() {
                             }
                         },
                         icon = { Icon(item.icon, contentDescription = item.label) },
-                        label = { Text(item.label) }
+                        label = { Text(item.label) },
+                        colors = NavigationBarItemDefaults.colors(
+                            selectedIconColor   = TextIcon,
+                            unselectedIconColor = TextIcon.copy(alpha = 0.55f),
+                            selectedTextColor   = TextIcon,
+                            unselectedTextColor = TextIcon.copy(alpha = 0.55f),
+                            indicatorColor      = PillGreen // ← adiós morado, hola verde
+                        )
                     )
                 }
             }
@@ -75,14 +79,14 @@ fun UserHome() {
         ) {
             composable(UserRoute.Inicio.path) {
                 InicioUsuarioScreen(
-                    onProgramar = { nav.navigate(UserRoute.Programar.path) },
+                    onProgramar   = { nav.navigate(UserRoute.Programar.path) },
                     onRecompensas = { nav.navigate(UserRoute.Recompensas.path) }
                 )
             }
-            composable(UserRoute.Programar.path) { ProgramarSolicitudScreen() }
+            composable(UserRoute.Programar.path)   { ProgramarSolicitudScreen() }
             composable(UserRoute.Recompensas.path) { RecompensasScreen() }
-            composable(UserRoute.Historial.path) { HistorialScreen() }
-            composable(UserRoute.Perfil.path) { PerfilScreen() }
+            composable(UserRoute.Historial.path)   { HistorialScreen() }
+            composable(UserRoute.Perfil.path)      { PerfilScreen() }
         }
     }
 }
