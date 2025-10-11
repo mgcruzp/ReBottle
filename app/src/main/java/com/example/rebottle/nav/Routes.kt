@@ -15,10 +15,19 @@ sealed class Routes(val path: String) {
     }
 }
 
+// Rutas internas del usuario
 sealed class UserRoute(val path: String) {
     data object Inicio      : UserRoute("user/inicio")
     data object Programar   : UserRoute("user/programar")
     data object Recompensas : UserRoute("user/recompensas")
     data object Historial   : UserRoute("user/historial")
     data object Perfil      : UserRoute("user/perfil")
+}
+
+// Rutas internas Empresa REP
+sealed class RepRoute(val path: String) {
+    data object Inicio        : RepRoute("rep/inicio")
+    data object Reportes      : RepRoute("rep/reportes")
+    data object Cumplimiento  : RepRoute("rep/cumplimiento")
+    data object Perfil        : RepRoute("rep/perfil")
 }

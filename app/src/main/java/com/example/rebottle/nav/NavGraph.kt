@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.rebottle.ui.screens.home.UserHome
+import com.example.rebottle.ui.screens.home.RepHome  // <-- IMPORTANTE
 
 @Composable
 fun NavGraph(nav: NavHostController) {
@@ -59,16 +60,15 @@ fun NavGraph(nav: NavHostController) {
             val role = runCatching { Role.valueOf(roleStr) }.getOrDefault(Role.USUARIO)
 
             when (role) {
-                Role.USUARIO -> UserHome()
-                Role.RECOLECTOR -> Surface { Text("Home Recolector — por construir") }
-                Role.EMPRESA_REP -> Surface { Text("Home Empresa REP — por construir") }
+                Role.USUARIO     -> UserHome()
+                Role.RECOLECTOR  -> Surface { Text("Home Recolector — por construir") }
+                Role.EMPRESA_REP -> RepHome()   // <-- AQUÍ ENTRAMOS AL FLUJO DE EMPRESA REP
             }
         }
-
     }
 }
 
-/** Placeholder simple para Home por rol (todo en un solo archivo). */
+/** (Opcional) Placeholder simple si lo quieres mantener para pruebas. */
 @Composable
 private fun HomeScreen(role: Role) {
     Surface {

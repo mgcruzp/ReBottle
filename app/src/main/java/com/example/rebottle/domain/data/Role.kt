@@ -1,3 +1,4 @@
+
 package com.example.rebottle.domain.data
 
 enum class Role {

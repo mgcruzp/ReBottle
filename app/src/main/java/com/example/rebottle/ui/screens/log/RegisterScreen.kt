@@ -1,7 +1,9 @@
 package com.example.rebottle.ui.screens.log
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -19,7 +21,7 @@ import com.example.rebottle.R
 import com.example.rebottle.domain.data.Role
 import com.example.rebottle.ui.components.PrimaryButton
 import com.example.rebottle.ui.components.RoleSelector
-import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.platform.LocalContext
 
 @Composable
 fun RegisterScreen(
@@ -30,17 +32,17 @@ fun RegisterScreen(
     var email by remember { mutableStateOf("") }
     var pass by remember { mutableStateOf("") }
     var role by remember { mutableStateOf<Role?>(null) }
+    val context = LocalContext.current
 
     Surface(color = Color.White) {
         Box(modifier = Modifier.fillMaxSize()) {
 
-            // Decoración superior (deja EXACTAMENTE 350.dp)
             Image(
                 painter = painterResource(id = R.drawable.decor_top),
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(350.dp)               // <- tal cual lo pediste
+                    .height(350.dp)
                     .align(Alignment.TopCenter),
                 contentScale = ContentScale.FillWidth
             )
@@ -51,7 +53,6 @@ fun RegisterScreen(
                     .padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Logo
                 Image(
                     painter = painterResource(id = R.drawable.logo_rebottle),
                     contentDescription = "Logo Rebottle",
@@ -115,7 +116,9 @@ fun RegisterScreen(
                 PrimaryButton(
                     text = "Continuar",
                     enabled = role != null && name.isNotBlank() && email.isNotBlank() && pass.isNotBlank(),
-                    onClick = { role?.let(onRegistered) },
+                    onClick = {
+                        role?.let(onRegistered) ?: Toast.makeText(context, "Selecciona un rol", Toast.LENGTH_SHORT).show()
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(60.dp)
