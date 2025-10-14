@@ -221,8 +221,8 @@ fun PantallaRegistrarEntrega() {
                     .fillMaxWidth()
                     .height(50.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = MidGreen,
-                    contentColor = Color.White
+                    containerColor = LightGreen,
+                    contentColor = DarkGreen
                 ),
                 shape = RoundedCornerShape(12.dp)
             ) {
