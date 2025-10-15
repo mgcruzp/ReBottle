@@ -18,30 +18,33 @@ import com.google.maps.android.compose.Marker
 import com.google.android.gms.maps.model.LatLng
 import com.example.rebottle.ui.theme.LightGreen
 import com.example.rebottle.ui.theme.DarkGreen
+import com.google.android.gms.maps.model.CameraPosition // Importa esta clase
+import com.google.maps.android.compose.MarkerState
+import com.google.maps.android.compose.rememberMarkerState
 
 @Composable
 fun PantallaMapaRecolector() {
     val bogota = LatLng(4.7110, -74.0721) // ubicación inicial
+
     val cameraPositionState = rememberCameraPositionState {
-        position = com.google.android.gms.maps.model.CameraPosition.fromLatLngZoom(bogota, 12f)
+        position = CameraPosition.fromLatLngZoom(bogota, 12f)
     }
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(LightGreen) // fondo del verde claro de tu paleta
+            .background(LightGreen)
     ) {
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState
         ) {
             Marker(
-               // position = bogota,
+                state = MarkerState(position = bogota), // Se usa 'state' en lugar de 'position'
                 title = "Ubicación actual",
                 snippet = "Recolector ReBottle"
             )
         }
-
         Text(
             text = "Mapa de recolección",
             modifier = Modifier
@@ -50,9 +53,13 @@ fun PantallaMapaRecolector() {
                 .padding(top = 16.dp),
             color = DarkGreen,
             style = MaterialTheme.typography.titleMedium
-            )
+        )
     }
 }
 @Preview(showBackground = true)
 @Composable
-fun mapapreview(){}
+fun mapapreview(){
+    Box(modifier = Modifier.fillMaxSize()) {
+        Text("Vista previa del mapa")
+    }
+}

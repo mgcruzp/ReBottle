@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.rebottle.ui.screens.home.UserHome
 import com.example.rebottle.ui.screens.home.RepHome  // <-- IMPORTANTE
+import com.example.rebottle.ui.screens.recolector.RecolectorHome
 
 @Composable
 fun NavGraph(nav: NavHostController) {
@@ -61,7 +62,7 @@ fun NavGraph(nav: NavHostController) {
 
             when (role) {
                 Role.USUARIO     -> UserHome()
-                Role.RECOLECTOR  -> Surface { Text("Home Recolector — por construir") }
+                Role.RECOLECTOR  -> RecolectorHome()
                 Role.EMPRESA_REP -> RepHome()   // <-- AQUÍ ENTRAMOS AL FLUJO DE EMPRESA REP
             }
         }
