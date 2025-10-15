@@ -1,0 +1,65 @@
+package com.example.rebottle.ui.screens.recolector
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.rememberCameraPositionState
+import com.google.maps.android.compose.Marker
+import com.google.android.gms.maps.model.LatLng
+import com.example.rebottle.ui.theme.LightGreen
+import com.example.rebottle.ui.theme.DarkGreen
+import com.google.android.gms.maps.model.CameraPosition // Importa esta clase
+import com.google.maps.android.compose.MarkerState
+import com.google.maps.android.compose.rememberMarkerState
+
+@Composable
+fun PantallaMapaRecolector() {
+    val bogota = LatLng(4.7110, -74.0721) // ubicación inicial
+
+    val cameraPositionState = rememberCameraPositionState {
+        position = CameraPosition.fromLatLngZoom(bogota, 12f)
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(LightGreen)
+    ) {
+        GoogleMap(
+            modifier = Modifier.fillMaxSize(),
+            cameraPositionState = cameraPositionState
+        ) {
+            Marker(
+                state = MarkerState(position = bogota), // Se usa 'state' en lugar de 'position'
+                title = "Ubicación actual",
+                snippet = "Recolector ReBottle"
+            )
+        }
+        Text(
+            text = "Mapa de recolección",
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .background(LightGreen.copy(alpha = 0.8f))
+                .padding(top = 16.dp),
+            color = DarkGreen,
+            style = MaterialTheme.typography.titleMedium
+        )
+    }
+}
+@Preview(showBackground = true)
+@Composable
+fun mapapreview(){
+    Box(modifier = Modifier.fillMaxSize()) {
+        Text("Vista previa del mapa")
+    }
+}

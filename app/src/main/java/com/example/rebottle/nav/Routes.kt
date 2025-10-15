@@ -31,3 +31,10 @@ sealed class RepRoute(val path: String) {
     data object Cumplimiento  : RepRoute("rep/cumplimiento")
     data object Perfil        : RepRoute("rep/perfil")
 }
+
+// Rutas internas del Recolector
+sealed class CollectorRoute(val path: String) {
+    data object Inicio   : CollectorRoute("collector/inicio")
+    data object Registro : CollectorRoute("collector/registro")
+    data object Mapa   : CollectorRoute("collector/mapa")
+}
