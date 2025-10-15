@@ -62,7 +62,7 @@ fun PantallaRegistrarEntrega() {
             contentDescription = null,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(300.dp)
+                .height(350.dp)
                 .align(Alignment.TopCenter),
             contentScale = ContentScale.FillBounds
         )
