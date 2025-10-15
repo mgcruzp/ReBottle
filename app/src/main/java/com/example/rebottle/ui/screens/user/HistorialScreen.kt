@@ -32,7 +32,7 @@ fun HistorialScreen() {
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        "Historial de solicitudes",
+                        "Historial de recolecciones",
                         style = MaterialTheme.typography.titleLarge.copy(
                             fontSize = 30.sp,
                             fontWeight = FontWeight.Bold

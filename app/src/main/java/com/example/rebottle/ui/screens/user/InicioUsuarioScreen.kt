@@ -62,7 +62,7 @@ fun InicioUsuarioScreen(
 
                 ActionCard(
                     imageRes = R.drawable.programar,
-                    title = "Programar solicitud",
+                    title = "Programar recoleccion",
                     onClick = onProgramar,
                     modifier = Modifier.fillMaxWidth()
                 )
