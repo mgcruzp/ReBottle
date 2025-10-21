@@ -1,6 +1,8 @@
 package com.example.rebottle.ui.screens.recolector
 
+import android.app.Activity
 import android.content.Context
+import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -26,12 +28,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
 import com.example.rebottle.R
-import com.example.rebottle.ui.theme.DarkGreen
-import com.example.rebottle.ui.theme.LightGreen
-import com.example.rebottle.ui.theme.MidGreen
+import com.example.rebottle.ui.screens.recolector.ModelEntrega
+import com.example.rebottle.ui.screens.recolector.StorageCsv
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
+import com.example.rebottle.ui.theme.DarkGreen
+import com.example.rebottle.ui.theme.LightGreen
+import com.example.rebottle.ui.theme.MidGreen
+import com.journeyapps.barcodescanner.IntentIntegrator
+import com.journeyapps.barcodescanner.ScanIntentResult
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,15 +46,38 @@ fun PantallaRegistrarEntrega() {
 
     var lugarRecoleccion by remember { mutableStateOf("") }
     var pesoRegistrado by remember { mutableStateOf("") }
-    var photoCapturada by remember { mutableStateOf(false) }
+    var fotoUri by remember { mutableStateOf<Uri?>(null) }
+    var fotoTomada by remember { mutableStateOf(false) }
 
+    // Lanzador para tomar foto
     val cameraLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture()
     ) { success ->
         if (success) {
-            photoCapturada = true
+            fotoTomada = true
             Toast.makeText(context, "📸 Foto capturada correctamente", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    // Lanzador para escanear QR
+    val qrLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        val intentResult = IntentIntegrator.parseActivityResult(
+            result.resultCode,
+            result.data
+        )
+        intentResult?.contents?.let {
+            lugarRecoleccion = it
+            Toast.makeText(context, "QR escaneado: $it ", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    // Función para crear archivo temporal de imagen
+    fun crearArchivoImagen(context: Context): File {
+        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+        val storageDir = context.getExternalFilesDir(null)
+        return File.createTempFile("JPEG_${timeStamp}_", ".jpg", storageDir)
     }
 
     Box(
@@ -62,12 +91,11 @@ fun PantallaRegistrarEntrega() {
             contentDescription = null,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(350.dp)
+                .height(300.dp)
                 .align(Alignment.TopCenter),
             contentScale = ContentScale.FillBounds
         )
 
-        // Contenido principal
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -100,9 +128,7 @@ fun PantallaRegistrarEntrega() {
                     color = DarkGreen
                 )
             )
-
             Spacer(modifier = Modifier.height(6.dp))
-
             TextField(
                 value = lugarRecoleccion,
                 onValueChange = { lugarRecoleccion = it },
@@ -115,7 +141,7 @@ fun PantallaRegistrarEntrega() {
                     unfocusedContainerColor = Color(0xFFF5F5F5),
                     focusedContainerColor = Color.White,
                     unfocusedIndicatorColor = Color.Transparent,
-                    focusedIndicatorColor = DarkGreen
+                    focusedIndicatorColor =    DarkGreen
                 ),
                 shape = RoundedCornerShape(12.dp)
             )
@@ -131,9 +157,7 @@ fun PantallaRegistrarEntrega() {
                     color = DarkGreen
                 )
             )
-
             Spacer(modifier = Modifier.height(6.dp))
-
             TextField(
                 value = pesoRegistrado,
                 onValueChange = { pesoRegistrado = it },
@@ -156,8 +180,10 @@ fun PantallaRegistrarEntrega() {
             // Botón Escanear QR
             Button(
                 onClick = {
-                    lugarRecoleccion = "Punto escaneado #${(1..100).random()}"
-                    Toast.makeText(context, "QR escaneado correctamente ✅", Toast.LENGTH_SHORT).show()
+                    val integrator = IntentIntegrator(context as Activity)
+                    integrator.setPrompt("Escanea el código QR")
+                    integrator.setOrientationLocked(true)
+                    qrLauncher.launch(integrator.createScanIntent())
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -176,13 +202,13 @@ fun PantallaRegistrarEntrega() {
             // Botón Tomar Foto
             Button(
                 onClick = {
-                    val photoFile = createImageFile(context)
-                    val photoUri = FileProvider.getUriForFile(
+                    val fotoFile = crearArchivoImagen(context)
+                    fotoUri = FileProvider.getUriForFile(
                         context,
                         "${context.packageName}.fileprovider",
-                        photoFile
+                        fotoFile
                     )
-                    cameraLauncher.launch(photoUri)
+                    fotoUri?.let { cameraLauncher.launch(it) }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -193,7 +219,7 @@ fun PantallaRegistrarEntrega() {
                 ),
                 shape = RoundedCornerShape(12.dp)
             ) {
-                Text("📸 Tomar Foto", fontWeight = FontWeight.SemiBold)
+                Text("Tomar Foto", fontWeight = FontWeight.SemiBold)
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -203,12 +229,21 @@ fun PantallaRegistrarEntrega() {
                 onClick = {
                     if (lugarRecoleccion.isNotEmpty() &&
                         pesoRegistrado.isNotEmpty() &&
-                        photoCapturada
+                        fotoTomada
                     ) {
+                        val entrega = ModelEntrega(
+                            lugar = lugarRecoleccion,
+                            peso = pesoRegistrado.toFloat(),
+                            fotoPath = fotoUri?.path ?: "",
+                            fecha = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(Date())
+                        )
+                        StorageCsv.guardarEntrega(context, entrega)
                         Toast.makeText(context, "¡Registro exitoso! ♻", Toast.LENGTH_LONG).show()
+
+                        // Limpiar campos
                         lugarRecoleccion = ""
                         pesoRegistrado = ""
-                        photoCapturada = false
+                        fotoTomada = false
                     } else {
                         Toast.makeText(
                             context,
@@ -226,16 +261,10 @@ fun PantallaRegistrarEntrega() {
                 ),
                 shape = RoundedCornerShape(12.dp)
             ) {
-                Text("✅ Registrar", fontWeight = FontWeight.Bold)
+                Text("Registrar", fontWeight = FontWeight.Bold)
             }
         }
     }
-}
-
-private fun createImageFile(context: Context): File {
-    val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-    val storageDir = context.getExternalFilesDir(null)
-    return File.createTempFile("JPEG_${timeStamp}_", ".jpg", storageDir)
 }
 
 @Preview(showBackground = true)
