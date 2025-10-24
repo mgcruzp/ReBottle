@@ -1,5 +1,7 @@
 package com.example.rebottle
 
+import android.hardware.Sensor
+import android.hardware.SensorManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -10,6 +12,10 @@ import com.example.rebottle.nav.NavGraph
 import com.example.rebottle.ui.theme.RebottleTheme
 
 class MainActivity : ComponentActivity() {
+
+    private lateinit var sensorManager: SensorManager
+    private var lightSensor : Sensor? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
