@@ -7,6 +7,7 @@ sealed class Routes(val path: String) {
     data object Inicio   : Routes("inicio")
     data object Login    : Routes("login")
     data object Register : Routes("register")
+    data object Loading  : Routes("loading")
 
     // Home recibe el rol para enrutar al flujo correspondiente
     data object Home : Routes("home/{role}") {
@@ -37,4 +38,5 @@ sealed class CollectorRoute(val path: String) {
     data object Inicio   : CollectorRoute("collector/inicio")
     data object Registro : CollectorRoute("collector/registro")
     data object Mapa   : CollectorRoute("collector/mapa")
+    data object Perfil  : CollectorRoute("collector/perfil")
 }

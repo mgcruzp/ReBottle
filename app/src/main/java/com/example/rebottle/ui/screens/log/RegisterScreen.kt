@@ -22,9 +22,11 @@ import com.example.rebottle.domain.data.Role
 import com.example.rebottle.ui.components.PrimaryButton
 import com.example.rebottle.ui.components.RoleSelector
 import androidx.compose.ui.platform.LocalContext
+import com.example.rebottle.model.UserAuthViewModel
 
 @Composable
 fun RegisterScreen(
+    viewModel: UserAuthViewModel,
     onRegistered: (Role) -> Unit,
     onGoLogin: () -> Unit
 ) {
@@ -33,6 +35,15 @@ fun RegisterScreen(
     var pass by remember { mutableStateOf("") }
     var role by remember { mutableStateOf<Role?>(null) }
     val context = LocalContext.current
+    val state by viewModel.user.collectAsState()
+
+    // Mostrar loading
+    if (state.isLoading) {
+        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator()
+        }
+        return
+    }
 
     Surface(color = Color.White) {
         Box(modifier = Modifier.fillMaxSize()) {
@@ -117,7 +128,19 @@ fun RegisterScreen(
                     text = "Continuar",
                     enabled = role != null && name.isNotBlank() && email.isNotBlank() && pass.isNotBlank(),
                     onClick = {
-                        role?.let(onRegistered) ?: Toast.makeText(context, "Selecciona un rol", Toast.LENGTH_SHORT).show()
+                        role?.let{ selectedRole ->
+                            viewModel.registerUser(
+                                name = name,
+                                email = email,
+                                password = pass,
+                                role = selectedRole,
+                                onSuccess = { onRegistered(it)},
+                                onError = {
+                                    Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+                                }
+                            )
+
+                        }
                     },
                     modifier = Modifier
                         .fillMaxWidth()

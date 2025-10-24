@@ -7,6 +7,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Map
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -25,7 +26,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.rebottle.nav.CollectorRoute
+import com.example.rebottle.nav.UserRoute
 import com.example.rebottle.ui.screens.PantallaRecolector
+import com.example.rebottle.ui.screens.recolector.PerfilScreenR
 
 data class BottomItem(
     val route: CollectorRoute,
@@ -33,14 +36,16 @@ data class BottomItem(
     val icon: ImageVector
 )
 @Composable
-fun RecolectorHome() {
+fun RecolectorHome(onLogout: () -> Unit) {
     val nav = rememberNavController()
 
     val items = listOf(
         BottomItem(CollectorRoute.Inicio, "Inicio", Icons.Filled.Home),
         BottomItem(CollectorRoute.Registro, "Registrar", Icons.Filled.AddCircle),
-        BottomItem(CollectorRoute.Mapa, "Mapa", Icons.Filled.Map)
-    )
+        BottomItem(CollectorRoute.Mapa, "Mapa", Icons.Filled.Map),
+        BottomItem(CollectorRoute.Perfil, "Perfil", Icons.Filled.Person)
+        )
+
 
     val PillGreen = Color(0xFFB8F8AD)
     val TextIcon = Color(0xFF1B4332)
@@ -97,6 +102,9 @@ fun RecolectorHome() {
             }
             composable(CollectorRoute.Mapa.path) {
                 PantallaMapaRecolector()
+            }
+            composable(CollectorRoute.Perfil.path) {
+                PerfilScreenR()
             }
         }
     }

@@ -1,5 +1,6 @@
 package com.example.rebottle.ui.screens.log
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -19,18 +20,30 @@ import com.example.rebottle.R
 import com.example.rebottle.domain.data.Role
 import com.example.rebottle.ui.components.PrimaryButton
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.platform.LocalContext
+import com.example.rebottle.model.UserAuthViewModel
 
 private val Green = Color(0xFF1B4332)
 private val Mint  = Color(0xFFDCFFD6)
 
 @Composable
 fun LoginScreen(
+    viewModel: UserAuthViewModel,
     onLogin: (Role) -> Unit,
     onGoRegister: () -> Unit
 ) {
     var email by remember { mutableStateOf("") }
     var pass by remember { mutableStateOf("") }
     var remember by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    val state by viewModel.user.collectAsState()
+
+    if (state.isLoading) {
+        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator()
+        }
+        return
+    }
 
     Surface(color = Color.White) {
         Box(Modifier.fillMaxSize()) {
@@ -134,7 +147,16 @@ fun LoginScreen(
                 PrimaryButton(
                     text = "Continuar",
                     enabled = email.isNotBlank() && pass.isNotBlank(),
-                    onClick = { onLogin(Role.USUARIO) },
+                    onClick = {
+                        viewModel.loginUser(
+                            email = email,
+                            password = pass,
+                            onSuccess = { role -> onLogin(role) },
+                            onError = { error ->
+                                Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
+                            }
+                        )
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(60.dp)

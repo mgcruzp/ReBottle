@@ -22,7 +22,7 @@ import com.example.rebottle.nav.UserRoute
 data class BottomItem(val route: UserRoute, val label: String, val icon: ImageVector)
 
 @Composable
-fun UserHome() {
+fun UserHome(onLogout: () -> Unit) {
     val nav = rememberNavController()
     val items = listOf(
         BottomItem(UserRoute.Historial, "Historial", Icons.Filled.History),

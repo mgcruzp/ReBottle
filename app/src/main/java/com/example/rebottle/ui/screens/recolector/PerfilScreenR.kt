@@ -1,4 +1,4 @@
-package com.example.rebottle.ui.screens.home
+package com.example.rebottle.ui.screens.recolector
 
 import android.Manifest
 import android.content.pm.PackageManager
@@ -29,13 +29,14 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.rebottle.model.UserAuthViewModel
 import com.example.rebottle.ui.components.PrimaryButton
 import java.io.File
 
+import com.example.rebottle.model.UserAuthViewModel
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PerfilScreen(
+fun PerfilScreenR(
     emailFromAuth: String? = null,
     onLogout: (() -> Unit)? = null,
     viewModel: UserAuthViewModel = viewModel()
@@ -116,7 +117,6 @@ fun PerfilScreen(
                 }
             }
 
-
             Spacer(Modifier.height(20.dp))
 
             TextButton(
@@ -165,7 +165,8 @@ fun PerfilScreen(
 
             Spacer(Modifier.height(12.dp))
             OutlinedButton(
-                onClick = { viewModel.logout()  },
+                onClick = { viewModel.logout()
+                },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Red)
             ) {

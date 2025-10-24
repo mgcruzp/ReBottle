@@ -58,7 +58,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 
-
 /* ====== Colores ====== */
 private val PillGreen    = Color(0xFFB8F8AD)
 private val TextIcon     = Color(0xFF1B4332)   // títulos/íconos
@@ -68,7 +67,7 @@ private val CardWhite    = Color(0xFFFFFFFF)   // botones/targets blancos
 /* =====================  NAV + BOTTOM BAR  ===================== */
 
 @Composable
-fun RepHome() {
+fun RepHome(onLogout: () -> Unit) {
     val innerNav = rememberNavController()
 
     Scaffold(

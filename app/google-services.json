@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "290142348961",
+    "firebase_url": "https://rebottle-acc63-default-rtdb.firebaseio.com",
+    "project_id": "rebottle-acc63",
+    "storage_bucket": "rebottle-acc63.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:290142348961:android:898c8cfacba4fa84e6b2e0",
+        "android_client_info": {
+          "package_name": "com.example.rebottle"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD62-OncxWYUGY4SrZfHEs7W2DRyCSYc_M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
