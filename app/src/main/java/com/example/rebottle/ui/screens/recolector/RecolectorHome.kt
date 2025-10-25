@@ -1,5 +1,6 @@
 package com.example.rebottle.ui.screens.recolector
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -25,6 +26,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.rebottle.model.LocationViewModel
 import com.example.rebottle.nav.CollectorRoute
 import com.example.rebottle.nav.UserRoute
 import com.example.rebottle.ui.screens.PantallaRecolector
@@ -35,10 +37,11 @@ data class BottomItem(
     val label: String,
     val icon: ImageVector
 )
+@SuppressLint("ViewModelConstructorInComposable")
 @Composable
 fun RecolectorHome(onLogout: () -> Unit) {
     val nav = rememberNavController()
-
+    val vm = LocationViewModel()
     val items = listOf(
         BottomItem(CollectorRoute.Inicio, "Inicio", Icons.Filled.Home),
         BottomItem(CollectorRoute.Registro, "Registrar", Icons.Filled.AddCircle),
@@ -101,7 +104,7 @@ fun RecolectorHome(onLogout: () -> Unit) {
                 PantallaRegistrarEntrega()
             }
             composable(CollectorRoute.Mapa.path) {
-                PantallaMapaRecolector()
+                LocationScreen(vm)
             }
             composable(CollectorRoute.Perfil.path) {
                 PerfilScreenR(navController = nav,

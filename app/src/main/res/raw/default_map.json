@@ -1,0 +1,22 @@
+[
+  {
+    "featureType": "landscape.man_made",
+    "stylers": [
+      {
+        "color": "#97ea80"
+      },
+      {
+        "lightness": 60
+      }
+    ]
+  },
+  {
+    "featureType": "poi",
+    "elementType": "labels.icon",
+    "stylers": [
+      {
+        "color": "#259306"
+      }
+    ]
+  }
+]

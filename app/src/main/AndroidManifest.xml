@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.INTERNET"/>
 
 
 
@@ -15,9 +16,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.ReBottle">
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyDET_Ozqi8ny9UzDrMBqQvAeDFvVvm85iA" />
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -29,6 +27,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="${MAPS_API_KEY}"/>
     </application>
 
 </manifest>
