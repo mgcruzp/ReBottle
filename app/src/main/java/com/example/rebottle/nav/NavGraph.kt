@@ -56,7 +56,6 @@ fun NavGraph(
                 }
             }
 
-            // Mostrar indicador de carga
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
@@ -75,7 +74,7 @@ fun NavGraph(
         // LOGIN
         composable(Routes.Login.path) {
             LoginScreen(
-                viewModel = viewModel, // 👈 Pasar ViewModel
+                viewModel = viewModel,
                 onLogin = { role ->
                     nav.navigate(Routes.Home.create(role)) {
                         popUpTo(Routes.Inicio.path) { inclusive = true }
@@ -88,7 +87,7 @@ fun NavGraph(
         // REGISTRO
         composable(Routes.Register.path) {
             RegisterScreen(
-                viewModel = viewModel, // 👈 Pasar ViewModel
+                viewModel = viewModel,
                 onRegistered = { role ->
                     nav.navigate(Routes.Home.create(role)) {
                         popUpTo(Routes.Inicio.path) { inclusive = true }
@@ -98,7 +97,7 @@ fun NavGraph(
             )
         }
 
-        // HOME (ENRUTAMIENTO POR ROL)
+        // rutas
         composable(
             route = Routes.Home.path,
             arguments = listOf(navArgument(Routes.Home.ARG_ROLE) {
@@ -109,11 +108,11 @@ fun NavGraph(
                 ?: Role.USUARIO.name
             val role = runCatching { Role.valueOf(roleStr) }.getOrDefault(Role.USUARIO)
 
-            // Función para cerrar sesión
             val onLogout: () -> Unit = {
-                FirebaseAuth.getInstance().signOut()
-                nav.navigate(Routes.Inicio.path) {
-                    popUpTo(0) { inclusive = true }
+                viewModel.logout {
+                    nav.navigate(Routes.Inicio.path) {
+                        popUpTo(0) { inclusive = true }
+                    }
                 }
             }
 

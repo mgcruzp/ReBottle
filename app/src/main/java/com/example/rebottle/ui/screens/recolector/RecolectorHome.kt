@@ -104,7 +104,8 @@ fun RecolectorHome(onLogout: () -> Unit) {
                 PantallaMapaRecolector()
             }
             composable(CollectorRoute.Perfil.path) {
-                PerfilScreenR()
+                PerfilScreenR(navController = nav,
+                    onLogout = { onLogout() } )
             }
         }
     }

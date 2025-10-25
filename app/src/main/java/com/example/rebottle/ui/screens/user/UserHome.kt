@@ -86,7 +86,8 @@ fun UserHome(onLogout: () -> Unit) {
             composable(UserRoute.Programar.path)   { ProgramarSolicitudScreen() }
             composable(UserRoute.Recompensas.path) { RecompensasScreen() }
             composable(UserRoute.Historial.path)   { HistorialScreen() }
-            composable(UserRoute.Perfil.path)      { PerfilScreen() }
+            composable(UserRoute.Perfil.path)      { PerfilScreen(navController = nav,
+                onLogout = { onLogout() } ) }
         }
     }
 }

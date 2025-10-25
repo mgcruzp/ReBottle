@@ -29,8 +29,11 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import com.example.rebottle.model.UserAuthViewModel
+import com.example.rebottle.nav.Routes
 import com.example.rebottle.ui.components.PrimaryButton
+import com.google.firebase.auth.FirebaseAuth
 import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -38,6 +41,7 @@ import java.io.File
 fun PerfilScreen(
     emailFromAuth: String? = null,
     onLogout: (() -> Unit)? = null,
+    navController: NavHostController,
     viewModel: UserAuthViewModel = viewModel()
 ) {
     val ctx = LocalContext.current
@@ -165,7 +169,9 @@ fun PerfilScreen(
 
             Spacer(Modifier.height(12.dp))
             OutlinedButton(
-                onClick = { viewModel.logout()  },
+                onClick = {
+                    onLogout?.invoke()
+                          },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Red)
             ) {

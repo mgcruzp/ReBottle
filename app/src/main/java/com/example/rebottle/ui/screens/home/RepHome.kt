@@ -93,7 +93,7 @@ fun RepHome(onLogout: () -> Unit) {
                 }
                 composable(RepRoute.Reportes.path)     { RepReportesScreen() }
                 composable(RepRoute.Cumplimiento.path) { RepCumplimientoScreen() }
-                composable(RepRoute.Perfil.path) { PerfilScreene()
+                composable(RepRoute.Perfil.path) { PerfilScreene( onLogout = { onLogout() } )
                 }
             }
         }

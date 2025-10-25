@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
-// MODELO DE USUARIO
+// Modelo de usuario
 data class User(
     val uid: String = "",
     val name: String = "",
@@ -22,7 +22,7 @@ data class User(
     val createdAt: Long = System.currentTimeMillis()
 )
 
-// ESTADO DE AUTENTICACIÓN
+// estado de autenticación
 data class UserAuthState(
     val email: String = "",
     val password: String = "",
@@ -34,7 +34,6 @@ data class UserAuthState(
     val currentUser: User? = null
 )
 
-// VIEWMODEL DE AUTENTICACIÓN
 class UserAuthViewModel : ViewModel() {
 
     private val _user = MutableStateFlow(UserAuthState())
@@ -43,7 +42,7 @@ class UserAuthViewModel : ViewModel() {
     private val auth = FirebaseAuth.getInstance()
     private val database = FirebaseDatabase.getInstance().reference
 
-    // REGISTRO DE USUARIO
+    // Registro de usuario
     fun registerUser(
         name: String,
         email: String,
@@ -87,7 +86,7 @@ class UserAuthViewModel : ViewModel() {
         }
     }
 
-    // LOGIN DE USUARIO
+    // Login de usuarioo
     fun loginUser(
         email: String,
         password: String,
@@ -97,22 +96,22 @@ class UserAuthViewModel : ViewModel() {
         viewModelScope.launch {
             _user.value = _user.value.copy(isLoading = true)
             try {
-                // 1. Autenticar usuario con Firebase Auth
+                //Autenticar usuario con Firebase Auth
                 val result = auth.signInWithEmailAndPassword(email, password).await()
                 val uid = result.user?.uid ?: throw Exception("Error al iniciar sesión")
 
-                // 2. Obtener datos del usuario desde Realtime Database
+                //Obtener datos del usuario desde Realtime Database
                 val snapshot = database.child("users").child(uid).get().await()
                 val userData = snapshot.getValue(User::class.java)
                     ?: throw Exception("Usuario no encontrado en la base de datos")
 
-                // 3. Actualizar estado local
+                //Actualizar estado local
                 _user.value = _user.value.copy(
                     isLoading = false,
                     currentUser = userData
                 )
 
-                // 4. Notificar éxito con el rol
+                //Notificar éxito con el rol
                 onSuccess(userData.role)
 
             } catch (e: Exception) {
@@ -122,7 +121,7 @@ class UserAuthViewModel : ViewModel() {
         }
     }
 
-    // OBTENER ROL DEL USUARIO ACTUAL
+    // Obtiene rol del usuario actual
     fun getCurrentUserRole(onResult: (Role?) -> Unit) {
         val uid = auth.currentUser?.uid
         if (uid == null) {
@@ -144,9 +143,18 @@ class UserAuthViewModel : ViewModel() {
             })
     }
 
-    // CERRAR SESIÓN
-    fun logout() {
-        auth.signOut()
+    fun logout(onComplete: () -> Unit) {
+        viewModelScope.launch {
+            try {
+                auth.signOut()
+                _user.value = UserAuthState()
+                onComplete()
+            } catch (e: Exception) {
+                auth.signOut()
+                _user.value = UserAuthState()
+                onComplete()
+            }
+        }
     }
 
     fun updateEmail(newEmail: String) {
