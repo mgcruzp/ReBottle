@@ -34,6 +34,7 @@ import com.example.rebottle.ui.components.PrimaryButton
 import java.io.File
 
 import com.example.rebottle.model.UserAuthViewModel
+import com.example.rebottle.nav.CollectorRoute
 import com.example.rebottle.nav.Routes
 import com.google.firebase.auth.FirebaseAuth
 
@@ -161,10 +162,11 @@ fun PerfilScreenR(
             )
 
             Spacer(Modifier.height(20.dp))
-            PrimaryButton(
-                text = "Guardar cambios",
-                modifier = Modifier.fillMaxWidth().height(46.dp)
+            Button(
+                modifier = Modifier.fillMaxWidth().height(46.dp),
+                onClick = {navController.navigate(CollectorRoute.PendingRequests.path)}
             ) {
+                Text("Lista de Solicitudes")
             }
 
             Spacer(Modifier.height(12.dp))
@@ -177,6 +179,7 @@ fun PerfilScreenR(
             ) {
                 Text("Cerrar sesión")
             }
+
         }
     }
 }

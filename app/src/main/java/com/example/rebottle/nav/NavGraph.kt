@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.example.rebottle.ui.screens.home.UserHome
 import com.example.rebottle.ui.screens.home.RepHome
+import com.example.rebottle.ui.screens.recolector.PendingRequestsScreen
 import com.example.rebottle.ui.screens.recolector.RecolectorHome
 import com.google.firebase.auth.FirebaseAuth
 

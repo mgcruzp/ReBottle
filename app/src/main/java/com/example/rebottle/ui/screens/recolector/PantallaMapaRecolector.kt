@@ -227,13 +227,39 @@ fun PantallaMapaRecolector(viewModel: LocationViewModel) {
             position = CameraPosition.fromLatLngZoom(LocActual, 18f)
         }
     }
-    var markers = remember { mutableStateListOf<MyMarker>() }
+    val markers by viewModel.markers.collectAsState()
     var longClickMarker = rememberUpdatedMarkerState(position = LocActual)
     var longClickMarkerTitle by remember {mutableStateOf("")}
     val routePoints = remember { mutableStateListOf<LatLng>() }
     val scope = rememberCoroutineScope()
 
     val directionsKey = context.getString(R.string.google_directions_key)
+
+    val pendingDest by viewModel.pendingRouteTo.collectAsState()
+
+    LaunchedEffect(pendingDest) {
+        val dest = pendingDest ?: return@LaunchedEffect
+        if (directionsKey.isBlank()) {
+            Toast.makeText(context, "API key vacía.", Toast.LENGTH_SHORT).show()
+            return@LaunchedEffect
+        }
+        val pts = withContext(Dispatchers.IO) {
+            DirectionsRepo.fetchRoutePoints(
+                origin = LocActual,
+                dest = dest,
+                apiKey = directionsKey
+            )
+        }
+        routePoints.clear()
+        routePoints.addAll(pts)
+        if (pts.isEmpty()) {
+            Toast.makeText(context, "No se pudo obtener la ruta.", Toast.LENGTH_SHORT).show()
+        }
+
+        viewModel.clearPendingRoute()
+
+    }
+
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -249,7 +275,7 @@ fun PantallaMapaRecolector(viewModel: LocationViewModel) {
                     longClickMarkerTitle = address
                     cameraPositionState.position =
                         CameraPosition.fromLatLngZoom(position, 18F)
-                    markers.add(MyMarker(position, longClickMarkerTitle))
+                    viewModel.addMarker(MyMarker(position, place))
                     val results = FloatArray(1)
                     android.location.Location.distanceBetween(
                         LocActual.latitude,
@@ -294,12 +320,12 @@ fun PantallaMapaRecolector(viewModel: LocationViewModel) {
                 Marker(
                     state = rememberUpdatedMarkerState(it.position),
                     title = it.title,
-
                 )
 
-                if (routePoints.isNotEmpty()) {
-                    Polyline(points = routePoints.toList(), width = 12f)
+
                 }
+            if (routePoints.isNotEmpty()) {
+                Polyline(points = routePoints.toList(), width = 12f)
             }
         }
 
@@ -320,7 +346,7 @@ fun PantallaMapaRecolector(viewModel: LocationViewModel) {
                         searchMarkerTitle.value =place
                         cameraPositionState.position =
                             CameraPosition.fromLatLngZoom(location, 18F)
-                        markers.add(MyMarker(location, place))
+                        viewModel.addMarker(MyMarker(location, place))
 
                         val results = FloatArray(1)
                         android.location.Location.distanceBetween(

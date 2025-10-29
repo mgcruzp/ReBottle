@@ -23,6 +23,7 @@ sealed class UserRoute(val path: String) {
     data object Recompensas : UserRoute("user/recompensas")
     data object Historial   : UserRoute("user/historial")
     data object Perfil      : UserRoute("user/perfil")
+    data object Solicitudes : UserRoute("user/solicitudes")
 }
 
 // Rutas internas Empresa REP
@@ -39,4 +40,6 @@ sealed class CollectorRoute(val path: String) {
     data object Registro : CollectorRoute("collector/registro")
     data object Mapa   : CollectorRoute("collector/mapa")
     data object Perfil  : CollectorRoute("collector/perfil")
+    data object PendingRequests : CollectorRoute("collector/pendingRequests")
+
 }

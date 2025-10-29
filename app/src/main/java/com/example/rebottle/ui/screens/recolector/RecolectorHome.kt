@@ -9,6 +9,7 @@ import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -17,6 +18,7 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -27,10 +29,14 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.rebottle.model.LocationViewModel
+import com.example.rebottle.model.MyMarker
+import com.example.rebottle.model.PendingRequestsViewModel
+import com.example.rebottle.model.PickupRequest
 import com.example.rebottle.nav.CollectorRoute
 import com.example.rebottle.nav.UserRoute
 import com.example.rebottle.ui.screens.PantallaRecolector
 import com.example.rebottle.ui.screens.recolector.PerfilScreenR
+import com.google.android.gms.maps.model.LatLng
 
 data class BottomItem(
     val route: CollectorRoute,
@@ -42,11 +48,13 @@ data class BottomItem(
 fun RecolectorHome(onLogout: () -> Unit) {
     val nav = rememberNavController()
     val vm = LocationViewModel()
+    val pvm = PendingRequestsViewModel()
     val items = listOf(
         BottomItem(CollectorRoute.Inicio, "Inicio", Icons.Filled.Home),
         BottomItem(CollectorRoute.Registro, "Registrar", Icons.Filled.AddCircle),
         BottomItem(CollectorRoute.Mapa, "Mapa", Icons.Filled.Map),
-        BottomItem(CollectorRoute.Perfil, "Perfil", Icons.Filled.Person)
+        BottomItem(CollectorRoute.Perfil, "Perfil", Icons.Filled.Person),
+        BottomItem(CollectorRoute.PendingRequests, "Solicitudes", Icons.Filled.Place)
         )
 
 
@@ -103,13 +111,36 @@ fun RecolectorHome(onLogout: () -> Unit) {
             composable(CollectorRoute.Registro.path) {
                 PantallaRegistrarEntrega()
             }
-            composable(CollectorRoute.Mapa.path) {
+           /* composable(CollectorRoute.Mapa.path) {
                 LocationScreen(vm)
-            }
+            } */
             composable(CollectorRoute.Perfil.path) {
                 PerfilScreenR(navController = nav,
-                    onLogout = { onLogout() } )
+                   onLogout = { onLogout() } )
             }
+            composable(CollectorRoute.PendingRequests.path) {
+                PendingRequestsScreen(pvm, nav, vm)
+            }
+
+            composable(CollectorRoute.Mapa.path) {
+                // lee lo que dejó la pantalla anterior
+                val lat = nav.previousBackStackEntry?.savedStateHandle?.get<Double>("targetLat")
+                val lng = nav.previousBackStackEntry?.savedStateHandle?.get<Double>("targetLng")
+                val addr = nav.previousBackStackEntry?.savedStateHandle?.get<String>("targetAddress")
+
+                // si hay destino, actualiza el VM COMPARTIDO
+                LaunchedEffect(lat, lng) {
+                    if (lat != null && lng != null) {
+                        val dest = LatLng(lat, lng)
+                        val marker = MyMarker(dest, addr.orEmpty())
+                        vm.replaceWith(marker)
+                    }
+                }
+
+                // muestra el mapa con el VM compartido
+                LocationScreen(vm)
+            }
+
         }
     }
 }

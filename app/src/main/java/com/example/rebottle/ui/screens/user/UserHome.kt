@@ -1,5 +1,6 @@
 package com.example.rebottle.ui.screens.home
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -17,12 +18,16 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.rebottle.model.MyPendingRequestsViewModel
 import com.example.rebottle.nav.UserRoute
+import com.example.rebottle.ui.screens.user.MyPendingRequestsScreen
 
 data class BottomItem(val route: UserRoute, val label: String, val icon: ImageVector)
 
+@SuppressLint("ViewModelConstructorInComposable")
 @Composable
 fun UserHome(onLogout: () -> Unit) {
+    val vm = MyPendingRequestsViewModel()
     val nav = rememberNavController()
     val items = listOf(
         BottomItem(UserRoute.Historial, "Historial", Icons.Filled.History),
@@ -83,11 +88,12 @@ fun UserHome(onLogout: () -> Unit) {
                     onRecompensas = { nav.navigate(UserRoute.Recompensas.path) }
                 )
             }
-            composable(UserRoute.Programar.path)   { ProgramarSolicitudScreen() }
+            composable(UserRoute.Programar.path)   { ProgramarSolicitudScreen(nav) }
             composable(UserRoute.Recompensas.path) { RecompensasScreen() }
             composable(UserRoute.Historial.path)   { HistorialScreen() }
             composable(UserRoute.Perfil.path)      { PerfilScreen(navController = nav,
                 onLogout = { onLogout() } ) }
+            composable(UserRoute.Solicitudes.path) { MyPendingRequestsScreen(vm) }
         }
     }
 }
