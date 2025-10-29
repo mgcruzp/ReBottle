@@ -13,6 +13,16 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import java.util.UUID
 
+data class RegistroRecoleccion(
+    val id: String = "",
+    val recolectorId: String = "",
+    val recolectorNombre: String = "",
+    val lugar: String = "",
+    val peso: Double = 0.0,
+    val fotoUri: String = "",
+    val fecha: Long = 0L
+)
+
 class RegistroRecoleccionViewModel : ViewModel() {
 
     private val _isLoading = MutableStateFlow(false)
@@ -32,24 +42,22 @@ class RegistroRecoleccionViewModel : ViewModel() {
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                // Obtener usuario actual
                 val currentUser = auth.currentUser
                     ?: throw Exception("Usuario no autenticado")
 
                 val recolectorId = currentUser.uid
 
-                // Subir foto a Firebase Storage (si existe)
+                // Subir foto
                 var fotoUrl = ""
                 if (fotoUri != null) {
                     val fotoRef = storage.reference
-                        .child("registros_fotos")
-                        .child("${recolectorId}_${System.currentTimeMillis()}.jpg")
+                        .child("registros_fotos/${recolectorId}_${System.currentTimeMillis()}.jpg")
 
                     fotoRef.putFile(fotoUri).await()
                     fotoUrl = fotoRef.downloadUrl.await().toString()
                 }
 
-                // Crear objeto de registro
+                // Crear registro
                 val registroId = UUID.randomUUID().toString()
                 val registro = RegistroRecoleccion(
                     id = registroId,
@@ -79,28 +87,26 @@ class RegistroRecoleccionViewModel : ViewModel() {
         }
     }
 
-    // Obtener registros del recolector actual
-    fun obtenerRegistrosRecolector(
-        onResult: (List<RegistroRecoleccion>) -> Unit,
+    // ✅ Mover esta función AQUÍ
+    fun obtenerTotales(
+        onResult: (Int, Double) -> Unit,
         onError: (String) -> Unit
     ) {
         viewModelScope.launch {
             try {
-                val currentUser = auth.currentUser
-                    ?: throw Exception("Usuario no autenticado")
+                val currentUser = auth.currentUser ?: throw Exception("Usuario no autenticado")
 
                 val snapshot = firestore.collection("registros_recoleccion")
                     .whereEqualTo("recolectorId", currentUser.uid)
                     .get()
                     .await()
 
-                val registros = snapshot.documents.mapNotNull { doc ->
-                    doc.toObject(RegistroRecoleccion::class.java)
-                }
+                val totalEntregas = snapshot.size()
+                val totalPeso = snapshot.documents.sumOf { it.getDouble("peso") ?: 0.0 }
 
-                onResult(registros)
+                onResult(totalEntregas, totalPeso)
             } catch (e: Exception) {
-                onError(e.message ?: "Error al obtener registros")
+                onError(e.message ?: "Error al obtener totales")
             }
         }
     }

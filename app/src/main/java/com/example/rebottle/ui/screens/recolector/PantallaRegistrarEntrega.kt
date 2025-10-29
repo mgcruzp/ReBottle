@@ -12,6 +12,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -44,10 +45,10 @@ fun PantallaRegistrarEntrega(
 ) {
     val context = LocalContext.current
 
-    var lugarRecoleccion by remember { mutableStateOf("") }
-    var pesoRegistrado by remember { mutableStateOf("") }
-    var qrEscaneado by remember { mutableStateOf(false) }
-    var photoUri by remember { mutableStateOf<Uri?>(null) }
+    var lugarRecoleccion by rememberSaveable { mutableStateOf("") }
+    var pesoRegistrado by rememberSaveable { mutableStateOf("") }
+    var qrEscaneado by rememberSaveable { mutableStateOf(false) }
+    var photoUri by rememberSaveable { mutableStateOf<String?>(null) }
 
     val isLoading by viewModel.isLoading.collectAsState()
 
@@ -198,10 +199,12 @@ fun PantallaRegistrarEntrega(
             Spacer(modifier = Modifier.height(16.dp))
 
             // Botón Tomar Foto
+            var photoUri by remember { mutableStateOf<Uri?>(null) }
+
             Button(
                 onClick = {
                     val photoFile = createImageFile(context)
-                    val uri = FileProvider.getUriForFile(
+                    val uri = androidx.core.content.FileProvider.getUriForFile(
                         context,
                         "${context.packageName}.fileprovider",
                         photoFile
@@ -250,25 +253,17 @@ fun PantallaRegistrarEntrega(
                         peso = peso,
                         fotoUri = photoUri,
                         onSuccess = {
-                            Toast.makeText(
-                                context,
-                                "¡Registro exitoso! ",
-                                Toast.LENGTH_LONG
-                            ).show()
-                            // Limpiar campos
+                            Toast.makeText(context, "¡Registro exitoso!", Toast.LENGTH_LONG).show()
                             lugarRecoleccion = ""
                             pesoRegistrado = ""
                             qrEscaneado = false
                             photoUri = null
                         },
                         onError = { error ->
-                            Toast.makeText(
-                                context,
-                                "Error: $error",
-                                Toast.LENGTH_LONG
-                            ).show()
+                            Toast.makeText(context, "Error: $error", Toast.LENGTH_LONG).show()
                         }
                     )
+
                 },
                 modifier = Modifier
                     .fillMaxWidth()
