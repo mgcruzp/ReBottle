@@ -29,6 +29,7 @@ import androidx.navigation.NavController
 import com.example.rebottle.R
 import com.example.rebottle.model.RegistroRecoleccionViewModel
 import com.example.rebottle.nav.AppScreens
+import com.example.rebottle.nav.CollectorRoute
 import com.example.rebottle.ui.theme.DarkGreen
 import com.example.rebottle.ui.theme.LightGreen
 import java.io.File
@@ -178,9 +179,7 @@ fun PantallaRegistrarEntrega(
 
             // Botón Escanear QR
             Button(
-                onClick = {
-                    navController.navigate(AppScreens.Scanner.name)
-                },
+                onClick = {navController.navigate(CollectorRoute.QR.path)},
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),
@@ -230,8 +229,7 @@ fun PantallaRegistrarEntrega(
             // Botón Registrar
             Button(
                 onClick = {
-                    if (lugarRecoleccion.isEmpty() || pesoRegistrado.isEmpty() ||
-                        !qrEscaneado || photoUri == null
+                    if (lugarRecoleccion.isEmpty() || pesoRegistrado.isEmpty() || photoUri == null
                     ) {
                         Toast.makeText(
                             context,

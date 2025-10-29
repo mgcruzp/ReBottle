@@ -110,6 +110,9 @@ fun RecolectorHome(onLogout: () -> Unit) {
                 PerfilScreenR(navController = nav,
                     onLogout = { onLogout() } )
             }
+            composable(CollectorRoute.QR.path) {
+                ScannerScreen(navController = nav)
+            }
         }
     }
 }
