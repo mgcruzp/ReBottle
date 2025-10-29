@@ -36,6 +36,8 @@ import java.io.File
 import com.example.rebottle.model.UserAuthViewModel
 import com.example.rebottle.nav.CollectorRoute
 import com.example.rebottle.nav.Routes
+import com.example.rebottle.ui.theme.DarkGreen
+import com.example.rebottle.ui.theme.LightGreen
 import com.google.firebase.auth.FirebaseAuth
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -164,9 +166,13 @@ fun PerfilScreenR(
             Spacer(Modifier.height(20.dp))
             Button(
                 modifier = Modifier.fillMaxWidth().height(46.dp),
-                onClick = {navController.navigate(CollectorRoute.PendingRequests.path)}
+                onClick = {navController.navigate(CollectorRoute.PendingRequests.path)},
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = LightGreen,
+                    contentColor = DarkGreen
+                ),
             ) {
-                Text("Lista de Solicitudes")
+                Text("Guardar Cambios")
             }
 
             Spacer(Modifier.height(12.dp))

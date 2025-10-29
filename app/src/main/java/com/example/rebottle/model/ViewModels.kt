@@ -3,7 +3,10 @@ package com.example.rebottle.model
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.rebottle.domain.data.Role
+import com.google.firebase.auth.ActionCodeSettings
+import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthRecentLoginRequiredException
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -172,4 +175,86 @@ class UserAuthViewModel : ViewModel() {
     fun updatePassError(error: String) {
         _user.value = _user.value.copy(passError = error)
     }
+
+
+    fun updateProfile(
+        newName: String?,
+        newEmail: String?,
+        newPassword: String?,
+        currentPassword: String? = null,
+        onSuccess: (String) -> Unit,
+        onError: (String) -> Unit
+    ) {
+        viewModelScope.launch {
+            try {
+                val user = auth.currentUser ?: throw IllegalStateException("No autenticado")
+                val uid = user.uid
+
+                // 1) Cambiar NOMBRE en RTDB (si viene)
+                if (!newName.isNullOrBlank()) {
+                    database.child("users").child(uid).child("name").setValue(newName).await()
+                    _user.value = _user.value.copy(currentUser = _user.value.currentUser?.copy(name = newName))
+                }
+
+                // 2) Cambiar PASSWORD (si viene)
+                if (!newPassword.isNullOrBlank()) {
+                    require(newPassword.length >= 6) { "La contraseña debe tener al menos 6 caracteres." }
+                    try {
+                        user.updatePassword(newPassword).await()
+                    } catch (e: FirebaseAuthRecentLoginRequiredException) {
+                        val pwd = currentPassword ?: throw e
+                        val cred = EmailAuthProvider.getCredential(user.email ?: "", pwd)
+                        user.reauthenticate(cred).await()
+                        user.updatePassword(newPassword).await()
+                    }
+                }
+
+                // 3) Iniciar cambio de EMAIL (no tocar RTDB email aún)
+                var sentVerification = false
+                if (!newEmail.isNullOrBlank() && newEmail != user.email) {
+                    try {
+                        user.verifyBeforeUpdateEmail(newEmail).await()
+                        sentVerification = true
+                    } catch (e: FirebaseAuthRecentLoginRequiredException) {
+                        val pwd = currentPassword ?: throw e
+                        val cred = EmailAuthProvider.getCredential(user.email ?: "", pwd)
+                        user.reauthenticate(cred).await()
+                        user.verifyBeforeUpdateEmail(newEmail).await()
+                        sentVerification = true
+                    }
+                }
+
+                onSuccess(
+                    when {
+                        sentVerification -> "Te enviamos un enlace al NUEVO correo. Ábrelo para completar el cambio."
+                        else -> "Datos actualizados correctamente."
+                    }
+                )
+            } catch (e: Exception) {
+                onError(e.message ?: "No se pudieron actualizar los datos")
+            }
+        }
+    }
+
+    suspend fun syncEmailToRtdbIfNeeded(): Boolean {
+        val u = auth.currentUser ?: return false
+        u.reload().await() // trae datos frescos desde Auth
+        val serverEmail = u.email ?: return false
+        val uid = u.uid
+
+        val dbEmailSnap = database.child("users").child(uid).child("email").get().await()
+        val dbEmail = dbEmailSnap.getValue(String::class.java)
+
+        return if (dbEmail != serverEmail) {
+            database.child("users").child(uid).child("email").setValue(serverEmail).await()
+            _user.value = _user.value.copy(
+                currentUser = _user.value.currentUser?.copy(email = serverEmail)
+            )
+            true
+        } else {
+            false
+        }
+    }
+
+
 }
