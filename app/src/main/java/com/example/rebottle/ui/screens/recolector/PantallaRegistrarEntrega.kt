@@ -25,7 +25,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.rebottle.R
+import com.example.rebottle.model.RegisterDeliveryViewModel
 import com.example.rebottle.ui.theme.DarkGreen
 import com.example.rebottle.ui.theme.LightGreen
 import com.example.rebottle.ui.theme.MidGreen
@@ -37,6 +39,7 @@ import java.util.*
 @Composable
 fun PantallaRegistrarEntrega() {
     val context = LocalContext.current
+    val vm: RegisterDeliveryViewModel = viewModel()
 
     var lugarRecoleccion by remember { mutableStateOf("") }
     var pesoRegistrado by remember { mutableStateOf("") }
@@ -49,6 +52,18 @@ fun PantallaRegistrarEntrega() {
             photoCapturada = true
             Toast.makeText(context, "📸 Foto capturada correctamente", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    val state by vm.state.collectAsState()
+
+    // Feedback
+    LaunchedEffect(state.successId, state.error) {
+        state.successId?.let {
+            Toast.makeText(context, "¡Registro exitoso! ♻", Toast.LENGTH_LONG).show()
+            lugarRecoleccion = ""; pesoRegistrado = ""; photoCapturada = false
+            vm.clear()
+        }
+        state.error?.let { Toast.makeText(context, it, Toast.LENGTH_SHORT).show() }
     }
 
     Box(
@@ -201,21 +216,8 @@ fun PantallaRegistrarEntrega() {
             // Botón Registrar
             Button(
                 onClick = {
-                    if (lugarRecoleccion.isNotEmpty() &&
-                        pesoRegistrado.isNotEmpty() &&
-                        photoCapturada
-                    ) {
-                        Toast.makeText(context, "¡Registro exitoso! ♻", Toast.LENGTH_LONG).show()
-                        lugarRecoleccion = ""
-                        pesoRegistrado = ""
-                        photoCapturada = false
-                    } else {
-                        Toast.makeText(
-                            context,
-                            "Por favor completa todos los campos y toma una foto",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
+                    // Validamos solo lugar y peso (se ignoran foto/QR)
+                    vm.register(lugarRecoleccion, pesoRegistrado)
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -226,7 +228,7 @@ fun PantallaRegistrarEntrega() {
                 ),
                 shape = RoundedCornerShape(12.dp)
             ) {
-                Text("✅ Registrar", fontWeight = FontWeight.Bold)
+                Text(if (state.loading) "Registrando..." else "✅ Registrar", fontWeight = FontWeight.Bold)
             }
         }
     }

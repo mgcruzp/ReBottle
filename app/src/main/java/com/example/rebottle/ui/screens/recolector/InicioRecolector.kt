@@ -9,6 +9,8 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -18,11 +20,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.rebottle.R
+import com.example.rebottle.model.CollectorHomeViewModel
 import com.example.rebottle.ui.theme.DarkGreen
 import com.example.rebottle.ui.theme.Typography
 @Composable
 fun PantallaRecolector() {
+    val vm: CollectorHomeViewModel = viewModel()
+    val s by vm.state.collectAsState()
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -75,9 +82,7 @@ fun PantallaRecolector() {
                 shape = RoundedCornerShape(16.dp),
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
             ) {
-                Column(
-                    modifier = Modifier.padding(16.dp)
-                ) {
+                Column(Modifier.padding(16.dp)) {
                     Text(
                         text = "Entregas finalizadas:",
                         style = MaterialTheme.typography.titleLarge.copy(
@@ -87,13 +92,10 @@ fun PantallaRecolector() {
                         )
                     )
                     Text(
-                        text = "12", // valor ejemplo
-                        style = Typography.headlineMedium.copy(
-                            color = DarkGreen,
-                            fontWeight = FontWeight.Bold
-                        )
+                        text = if (s.loading) "—" else s.deliveries.toString(),
+                        style = Typography.headlineMedium.copy(color = DarkGreen, fontWeight = FontWeight.Bold)
                     )
-                    Spacer(modifier = Modifier.height(39.dp))
+                    Spacer(Modifier.height(39.dp))
                     Text(
                         text = "Peso total entregado:",
                         style = MaterialTheme.typography.titleLarge.copy(
@@ -103,13 +105,10 @@ fun PantallaRecolector() {
                         )
                     )
                     Text(
-                        text = "56.8 kg",
-                        style = Typography.headlineMedium.copy(
-                            color = DarkGreen,
-                            fontWeight = FontWeight.Bold
-                        )
+                        text = if (s.loading) "—" else s.totalKg,
+                        style = Typography.headlineMedium.copy(color = DarkGreen, fontWeight = FontWeight.Bold)
                     )
-                    Spacer(modifier = Modifier.height(39.dp))
+                    Spacer(Modifier.height(39.dp))
                     Text(
                         text = "Ganancias totales:",
                         style = MaterialTheme.typography.titleLarge.copy(
@@ -119,11 +118,8 @@ fun PantallaRecolector() {
                         )
                     )
                     Text(
-                        text = "$34.500",
-                        style = Typography.headlineMedium.copy(
-                            color = DarkGreen,
-                            fontWeight = FontWeight.Bold
-                        )
+                        text = if (s.loading) "—" else s.totalCop,
+                        style = Typography.headlineMedium.copy(color = DarkGreen, fontWeight = FontWeight.Bold)
                     )
                 }
             }
