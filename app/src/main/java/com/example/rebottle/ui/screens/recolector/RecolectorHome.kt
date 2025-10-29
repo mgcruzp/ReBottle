@@ -101,7 +101,7 @@ fun RecolectorHome(onLogout: () -> Unit) {
                 PantallaRecolector()
             }
             composable(CollectorRoute.Registro.path) {
-                PantallaRegistrarEntrega()
+                PantallaRegistrarEntrega(navController = nav)
             }
             composable(CollectorRoute.Mapa.path) {
                 LocationScreen(vm)

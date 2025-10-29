@@ -1,6 +1,6 @@
 package com.example.rebottle.ui.screens.recolector
 
-import android.content.Context
+import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -10,8 +10,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -21,33 +21,56 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.example.rebottle.R
+import com.example.rebottle.model.RegistroRecoleccionViewModel
+import com.example.rebottle.nav.AppScreens
 import com.example.rebottle.ui.theme.DarkGreen
 import com.example.rebottle.ui.theme.LightGreen
-import com.example.rebottle.ui.theme.MidGreen
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PantallaRegistrarEntrega() {
+fun PantallaRegistrarEntrega(
+    navController: NavController,
+    viewModel: RegistroRecoleccionViewModel = viewModel()
+) {
     val context = LocalContext.current
 
     var lugarRecoleccion by remember { mutableStateOf("") }
     var pesoRegistrado by remember { mutableStateOf("") }
-    var photoCapturada by remember { mutableStateOf(false) }
+    var qrEscaneado by remember { mutableStateOf(false) }
+    var photoUri by remember { mutableStateOf<Uri?>(null) }
 
+    val isLoading by viewModel.isLoading.collectAsState()
+
+    // Recibir el resultado del scanner
+    val qrResult = navController.currentBackStackEntry
+        ?.savedStateHandle
+        ?.getLiveData<String>("qr_code")
+        ?.observeAsState()
+
+    // Cuando llegue el código QR escaneado
+    LaunchedEffect(qrResult?.value) {
+        qrResult?.value?.let { code ->
+            qrEscaneado = true
+            lugarRecoleccion = "Punto verificado: $code"
+            Toast.makeText(context, "QR verificado correctamente", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    // Launcher para cámara
     val cameraLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture()
     ) { success ->
         if (success) {
-            photoCapturada = true
-            Toast.makeText(context, "📸 Foto capturada correctamente", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "Foto capturada correctamente", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -156,19 +179,21 @@ fun PantallaRegistrarEntrega() {
             // Botón Escanear QR
             Button(
                 onClick = {
-                    lugarRecoleccion = "Punto escaneado #${(1..100).random()}"
-                    Toast.makeText(context, "QR escaneado correctamente ✅", Toast.LENGTH_SHORT).show()
+                    navController.navigate(AppScreens.Scanner.name)
                 },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = LightGreen,
+                    containerColor = if (qrEscaneado) Color(0xFF90EE90) else LightGreen,
                     contentColor = DarkGreen
                 ),
                 shape = RoundedCornerShape(12.dp)
             ) {
-                Text("📷 Escanear QR", fontWeight = FontWeight.SemiBold)
+                Text(
+                    if (qrEscaneado) "QR Verificado" else "Escanear código QR",
+                    fontWeight = FontWeight.SemiBold
+                )
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -177,23 +202,27 @@ fun PantallaRegistrarEntrega() {
             Button(
                 onClick = {
                     val photoFile = createImageFile(context)
-                    val photoUri = FileProvider.getUriForFile(
+                    val uri = FileProvider.getUriForFile(
                         context,
                         "${context.packageName}.fileprovider",
                         photoFile
                     )
-                    cameraLauncher.launch(photoUri)
+                    photoUri = uri
+                    cameraLauncher.launch(uri)
                 },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = LightGreen,
+                    containerColor = if (photoUri != null) Color(0xFF90EE90) else LightGreen,
                     contentColor = DarkGreen
                 ),
                 shape = RoundedCornerShape(12.dp)
             ) {
-                Text("📸 Tomar Foto", fontWeight = FontWeight.SemiBold)
+                Text(
+                    if (photoUri != null) "Foto Capturada" else "Tomar Foto",
+                    fontWeight = FontWeight.SemiBold
+                )
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -201,21 +230,47 @@ fun PantallaRegistrarEntrega() {
             // Botón Registrar
             Button(
                 onClick = {
-                    if (lugarRecoleccion.isNotEmpty() &&
-                        pesoRegistrado.isNotEmpty() &&
-                        photoCapturada
+                    if (lugarRecoleccion.isEmpty() || pesoRegistrado.isEmpty() ||
+                        !qrEscaneado || photoUri == null
                     ) {
-                        Toast.makeText(context, "¡Registro exitoso! ♻", Toast.LENGTH_LONG).show()
-                        lugarRecoleccion = ""
-                        pesoRegistrado = ""
-                        photoCapturada = false
-                    } else {
                         Toast.makeText(
                             context,
-                            "Por favor completa todos los campos y toma una foto",
+                            "Por favor completa todos los campos",
                             Toast.LENGTH_SHORT
                         ).show()
+                        return@Button
                     }
+
+                    val peso = pesoRegistrado.toDoubleOrNull()
+                    if (peso == null) {
+                        Toast.makeText(context, "Peso inválido", Toast.LENGTH_SHORT).show()
+                        return@Button
+                    }
+
+                    viewModel.guardarRegistro(
+                        lugar = lugarRecoleccion,
+                        peso = peso,
+                        fotoUri = photoUri,
+                        onSuccess = {
+                            Toast.makeText(
+                                context,
+                                "¡Registro exitoso! ",
+                                Toast.LENGTH_LONG
+                            ).show()
+                            // Limpiar campos
+                            lugarRecoleccion = ""
+                            pesoRegistrado = ""
+                            qrEscaneado = false
+                            photoUri = null
+                        },
+                        onError = { error ->
+                            Toast.makeText(
+                                context,
+                                "Error: $error",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                    )
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -224,22 +279,24 @@ fun PantallaRegistrarEntrega() {
                     containerColor = LightGreen,
                     contentColor = DarkGreen
                 ),
-                shape = RoundedCornerShape(12.dp)
+                shape = RoundedCornerShape(12.dp),
+                enabled = !isLoading
             ) {
-                Text("✅ Registrar", fontWeight = FontWeight.Bold)
+                if (isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        color = DarkGreen
+                    )
+                } else {
+                    Text("Registrar", fontWeight = FontWeight.Bold)
+                }
             }
         }
     }
 }
 
-private fun createImageFile(context: Context): File {
+private fun createImageFile(context: android.content.Context): File {
     val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
     val storageDir = context.getExternalFilesDir(null)
     return File.createTempFile("JPEG_${timeStamp}_", ".jpg", storageDir)
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewPantallaRegistrarEntrega() {
-    PantallaRegistrarEntrega()
 }
