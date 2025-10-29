@@ -53,8 +53,8 @@ fun RecolectorHome(onLogout: () -> Unit) {
         BottomItem(CollectorRoute.Inicio, "Inicio", Icons.Filled.Home),
         BottomItem(CollectorRoute.Registro, "Registrar", Icons.Filled.AddCircle),
         BottomItem(CollectorRoute.Mapa, "Mapa", Icons.Filled.Map),
-        BottomItem(CollectorRoute.Perfil, "Perfil", Icons.Filled.Person),
-        BottomItem(CollectorRoute.PendingRequests, "Solicitudes", Icons.Filled.Place)
+        BottomItem(CollectorRoute.PendingRequests, "Solicitudes", Icons.Filled.Place),
+        BottomItem(CollectorRoute.Perfil, "Perfil", Icons.Filled.Person)
         )
 
 

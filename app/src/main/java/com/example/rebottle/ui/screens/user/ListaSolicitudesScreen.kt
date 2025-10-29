@@ -4,12 +4,14 @@ import com.example.rebottle.model.PickupRequest
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -37,7 +39,11 @@ fun MyPendingRequestsScreen(vm: MyPendingRequestsViewModel = viewModel()) {
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         items(s.items, key = { it.id }) { req ->
-                            MyPendingCard(req)
+                            MyPendingCard(req,
+                                    loading = s.actionLoadingId == req.id,
+                                    onComplete = { vm.markCompleted(req.id) },
+                                    onCancel = { vm.cancel(req.id)}
+                            )
                         }
                     }
                 }
@@ -47,7 +53,7 @@ fun MyPendingRequestsScreen(vm: MyPendingRequestsViewModel = viewModel()) {
 }
 
 @Composable
-private fun MyPendingCard(req: PickupRequest) {
+private fun MyPendingCard(req: PickupRequest, loading: Boolean, onComplete: () -> Unit, onCancel: () -> Unit) {
     Card(Modifier.fillMaxWidth()) {
         Column(Modifier.padding(16.dp)) {
             Text(req.brand.ifBlank { "Sin marca" }, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
@@ -64,5 +70,45 @@ private fun MyPendingCard(req: PickupRequest) {
             }
             Text("Estado: ${req.status}", style = MaterialTheme.typography.labelMedium)
         }
+
+        Row(modifier = Modifier.fillMaxWidth().padding(16.dp), horizontalArrangement = Arrangement.Start) {
+            Button(
+                onClick = onComplete,
+                enabled = !loading, // en esta lista siempre son PENDIENTE, pero deshabilitamos mientras procesa
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF4CAF50),
+                    contentColor = Color.White
+                ),
+                shape = RoundedCornerShape(10.dp),
+                modifier = Modifier.padding(16.dp)
+            ) {
+                if (loading) {
+                    CircularProgressIndicator(strokeWidth = 2.dp, modifier = Modifier.size(18.dp))
+                    Spacer(Modifier.width(8.dp))
+                    Text("Marcando…")
+                } else {
+                    Text("COMPLETAR")
+                }
+            }
+            Button(
+                onClick = onCancel,
+                enabled = !loading, // en esta lista siempre son PENDIENTE, pero deshabilitamos mientras procesa
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF4CAF50),
+                    contentColor = Color.White
+                ),
+                shape = RoundedCornerShape(10.dp),
+                modifier = Modifier.padding(16.dp)
+            ) {
+                if (loading) {
+                    CircularProgressIndicator(strokeWidth = 2.dp, modifier = Modifier.size(18.dp))
+                    Spacer(Modifier.width(8.dp))
+                    Text("Marcando…")
+                } else {
+                    Text("CANCELAR")
+                }
+            }
+        }
+
     }
 }
