@@ -232,7 +232,6 @@ private fun InicioCardBig(
         }
     }
 }
-
 /* =====================  REPORTES CERTIFICADOS (2 ítems)  ===================== */
 
 private data class CertReport(
@@ -247,85 +246,377 @@ private fun RepReportesScreen() {
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
-    val items = remember {
-        listOf(
-            CertReport("12/09/2025", "Enero–Agosto 2025", "18.2 t", "Certificado_REP_2025-08.pdf"),
-            CertReport("15/07/2025", "Enero–Junio 2025",  "12.0 t", "Certificado_REP_2025-06.pdf")
-        )
+    // La lista inicia VACÍA
+    val reports = remember {
+        mutableStateListOf<CertReport>()
     }
+
+    var showPaymentDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         containerColor = BgSoft,
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { padding ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(BgSoft)
-                .padding(padding)
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            item {
-                Box(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        "Reportes Certificados",
-                        color = TextIcon,
-                        style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.ExtraBold),
-                        textAlign = TextAlign.Center
-                    )
-                }
+        Box(modifier = Modifier.fillMaxSize()) {
 
-                Spacer(Modifier.height(10.dp))
-
-                Box(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.certificado),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .fillMaxWidth(0.75f)
-                            .height(160.dp)
-                    )
-                }
-                Spacer(Modifier.height(8.dp))
-            }
-
-            items(items) { r ->
-                ElevatedCard(
-                    colors = CardDefaults.elevatedCardColors(containerColor = CardWhite),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Column(
-                        Modifier.padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(6.dp)
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(BgSoft)
+                    .padding(padding)
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                item {
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.Center
                     ) {
-                        Text("Fecha: ${r.fecha}", fontWeight = FontWeight.SemiBold, color = TextIcon)
-                        Text("Periodo: ${r.periodo}", color = TextIcon.copy(alpha = 0.9f))
-                        Text("Total valorizado: ${r.toneladas}", color = TextIcon.copy(alpha = 0.9f))
-                        Spacer(Modifier.height(8.dp))
-                        FilledTonalButton(
-                            onClick = {
-                                scope.launch {
-                                    snackbarHostState.showSnackbar("Descarga simulada: ${r.archivo}")
+                        Text(
+                            "Reportes Certificados",
+                            color = TextIcon,
+                            style = MaterialTheme.typography.headlineLarge.copy(
+                                fontWeight = FontWeight.ExtraBold
+                            ),
+                            textAlign = TextAlign.Center
+                        )
+                    }
+
+                    Spacer(Modifier.height(10.dp))
+
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.certificado),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .fillMaxWidth(0.75f)
+                                .height(160.dp)
+                        )
+                    }
+
+                    Spacer(Modifier.height(12.dp))
+
+                    // --- BLOQUE: Comprar reporte ---
+                    ElevatedCard(
+                        colors = CardDefaults.elevatedCardColors(containerColor = CardWhite),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(
+                            Modifier.padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Text(
+                                "¿Quieres comprar un reporte?",
+                                style = MaterialTheme.typography.titleMedium,
+                                color = TextIcon
+                            )
+                            Text(
+                                "Paga por el acceso al reporte y este aparecerá en tu lista de reportes comprados.",
+                                color = TextIcon.copy(alpha = 0.85f)
+                            )
+                            Spacer(Modifier.height(8.dp))
+
+                            Row(
+                                Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.End
+                            ) {
+                                FilledTonalButton(onClick = { showPaymentDialog = true }) {
+                                    Text("Pagar")
                                 }
                             }
-                        ) {
-                            Icon(Icons.Outlined.Download, contentDescription = null)
-                            Spacer(Modifier.width(8.dp))
-                            Text("Descargar")
                         }
+                    }
+
+                    Spacer(Modifier.height(8.dp))
+                }
+
+                // --- LISTA DE REPORTES COMPRADOS (inicia vacía) ---
+                items(reports) { report ->
+                    ElevatedCard(
+                        colors = CardDefaults.elevatedCardColors(containerColor = CardWhite),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(
+                            Modifier.padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(6.dp)
+                        ) {
+                            Text(
+                                "Fecha: ${report.fecha}",
+                                fontWeight = FontWeight.SemiBold,
+                                color = TextIcon
+                            )
+                            Text(
+                                "Periodo: ${report.periodo}",
+                                color = TextIcon.copy(alpha = 0.9f)
+                            )
+                            Text(
+                                "Total valorizado: ${report.toneladas}",
+                                color = TextIcon.copy(alpha = 0.9f)
+                            )
+
+                            Spacer(Modifier.height(8.dp))
+
+                            FilledTonalButton(
+                                onClick = {
+                                    scope.launch {
+                                        snackbarHostState.showSnackbar(
+                                            "Descarga simulada: ${report.archivo}"
+                                        )
+                                    }
+                                }
+                            ) {
+                                Text("Descargar")
+                            }
+                        }
+                    }
+                }
+
+                item { Spacer(Modifier.height(48.dp)) }
+            }
+
+            // Diálogo de pago
+            if (showPaymentDialog) {
+                PaymentDialog(
+                    onDismiss = { showPaymentDialog = false },
+                    onSuccess = { purchasedReport ->
+                        reports.add(0, purchasedReport)
+                        scope.launch {
+                            snackbarHostState.showSnackbar("Pago exitoso. Reporte agregado.")
+                        }
+                        showPaymentDialog = false
+                    }
+                )
+            }
+
+            Box(
+                Modifier.fillMaxSize(),
+                contentAlignment = Alignment.BottomCenter
+            ) {
+                SnackbarHost(snackbarHostState)
+            }
+        }
+    }
+}
+
+@Composable
+private fun PaymentDialog(
+    onDismiss: () -> Unit,
+    onSuccess: (CertReport) -> Unit
+) {
+    val scope = rememberCoroutineScope()
+    var cardNumber by rememberSaveable { mutableStateOf("") }
+    var cardName by rememberSaveable { mutableStateOf("") }
+    var expiry by rememberSaveable { mutableStateOf("") }
+    var cvc by rememberSaveable { mutableStateOf("") }
+    var loading by remember { mutableStateOf(false) }
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    // Dialog centrado con tarjeta bonita
+    androidx.compose.ui.window.Dialog(
+        onDismissRequest = { if (!loading) onDismiss() }
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color(0x33000000)),
+            contentAlignment = Alignment.Center
+        ) {
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth(0.95f)           // <-- un poco más grande
+                    .padding(horizontal = 8.dp),
+                color = CardWhite,
+                shape = androidx.compose.foundation.shape.RoundedCornerShape(24.dp),
+                tonalElevation = 6.dp,
+                shadowElevation = 6.dp
+            ) {
+                Column(
+                    modifier = Modifier
+                        .padding(horizontal = 20.dp, vertical = 20.dp)
+                        .widthIn(max = 520.dp)       // <-- ancho máximo mayor
+                        .verticalScroll(rememberScrollState()),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(14.dp)
+                ) {
+                    // Encabezado
+                    Row(
+                        Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            "Generar pago",
+                            style = MaterialTheme.typography.titleLarge.copy(
+                                fontWeight = FontWeight.Bold
+                            ),
+                            color = TextIcon
+                        )
+                        TextButton(onClick = { if (!loading) onDismiss() }) {
+                            Text("Cerrar")
+                        }
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .size(70.dp)
+                            .clip(CircleShape)
+                            .background(PillGreen.copy(alpha = 0.6f)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            Icons.Filled.CheckCircle,
+                            contentDescription = null,
+                            tint = TextIcon,
+                            modifier = Modifier.size(38.dp)
+                        )
+                    }
+
+                    Text(
+                        "Ingresa los datos de tu tarjeta para generar tu reporte certificado.",
+                        textAlign = TextAlign.Center,
+                        color = TextIcon.copy(alpha = 0.85f),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+
+                    // Campos de tarjeta
+                    OutlinedTextField(
+                        value = cardNumber,
+                        onValueChange = { input ->
+                            val digits = input.filter { it.isDigit() }.take(19)
+                            cardNumber = digits.chunked(4).joinToString(" ")
+                        },
+                        label = { Text("Número de tarjeta") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    OutlinedTextField(
+                        value = cardName,
+                        onValueChange = { cardName = it },
+                        label = { Text("Nombre en la tarjeta") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    Row(
+                        Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        OutlinedTextField(
+                            value = expiry,
+                            onValueChange = { expiry = it.take(5) },
+                            // ⬇️ solo "MM/AA" para que no se corte
+                            label = { Text("MM/AA") },
+                            singleLine = true,
+                            modifier = Modifier.weight(1f)
+                        )
+                        OutlinedTextField(
+                            value = cvc,
+                            onValueChange = { cvc = it.filter { ch -> ch.isDigit() }.take(4) },
+                            label = { Text("CVC") },
+                            singleLine = true,
+                            modifier = Modifier.width(120.dp)
+                        )
+                    }
+
+                    if (loading) {
+                        LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+                    }
+
+                    Spacer(Modifier.height(4.dp))
+
+                    Button(
+                        onClick = {
+                            val cleanCard = cardNumber.replace(" ", "")
+                            if (cleanCard.length < 13 ||
+                                cardName.isBlank() ||
+                                expiry.length < 4 ||
+                                cvc.length < 3
+                            ) {
+                                scope.launch {
+                                    snackbarHostState.showSnackbar(
+                                        "Revisa los datos de la tarjeta."
+                                    )
+                                }
+                                return@Button
+                            }
+
+                            loading = true
+                            scope.launch {
+                                // Simulación de procesamiento
+                                kotlinx.coroutines.delay(1000)
+                                loading = false
+
+                                // Crear reporte comprado usando Calendar / SimpleDateFormat (API 24+)
+                                val cal = java.util.Calendar.getInstance()
+                                val sdfFecha = java.text.SimpleDateFormat(
+                                    "dd/MM/yyyy",
+                                    java.util.Locale.getDefault()
+                                )
+                                val sdfArchivo = java.text.SimpleDateFormat(
+                                    "yyyyMMdd_HHmmss",
+                                    java.util.Locale.getDefault()
+                                )
+
+                                val fecha = sdfFecha.format(cal.time)
+                                val nombreMes = cal.getDisplayName(
+                                    java.util.Calendar.MONTH,
+                                    java.util.Calendar.LONG,
+                                    java.util.Locale.getDefault()
+                                ) ?: "Mes"
+                                val year = cal.get(java.util.Calendar.YEAR)
+
+                                val periodo =
+                                    "Reporte comprado: ${
+                                        nombreMes.replaceFirstChar { it.uppercase() }
+                                    } $year"
+
+                                val archivoName =
+                                    "Certificado_COMPRADO_${
+                                        sdfArchivo.format(cal.time)
+                                    }.pdf"
+
+                                val nuevo = CertReport(
+                                    fecha = fecha,
+                                    periodo = periodo,
+                                    toneladas = "—",
+                                    archivo = archivoName
+                                )
+
+                                onSuccess(nuevo)
+                            }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(48.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = PillGreen,
+                            contentColor = TextIcon
+                        ),
+                        shape = androidx.compose.foundation.shape.RoundedCornerShape(14.dp),
+                        enabled = !loading
+                    ) {
+                        Text("Pagar")
+                    }
+
+                    Spacer(Modifier.height(8.dp))
+
+                    Box(
+                        Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        SnackbarHost(snackbarHostState)
                     }
                 }
             }
         }
     }
 }
+
+
 
 /* =====================  CUMPLIMIENTO REP  ===================== */
 
